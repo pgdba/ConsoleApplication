@@ -3,7 +3,7 @@
  * @author Jakub Rapacz <j.rapacz@tvn.pl>
  */
 
-namespace Hnk\ConsoleApplicationBundle;
+namespace Hnk\ConsoleApplicationBundle\Task;
 
 
 class CommonTask
