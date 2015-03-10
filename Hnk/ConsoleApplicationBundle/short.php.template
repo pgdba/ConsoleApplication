@@ -1,14 +1,14 @@
 #!/usr/bin/php
 <?php
 
-use Hnk\ConsoleApplicationBundle\Application;
-use Hnk\ConsoleApplicationBundle\SymfonyApplication;
+use Hnk\ConsoleApplicationBundle\Command;
+use Hnk\ConsoleApplicationBundle\SymfonyCommand;
 use Hnk\ConsoleApplicationBundle\SymfonyProject;
 
 require_once __DIR__ . '/bootstrap.php';
 
 // main application definition
-$mainApp = new Application('ConsoleApplication');
+$mainApp = new Command('ConsoleApplication');
 
 // define your commands here
 

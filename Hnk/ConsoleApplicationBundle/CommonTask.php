@@ -10,41 +10,34 @@ class CommonTask
 {
     /**
      * @param  string $name
-     * @param  string $path
-     * @param  string $commandPath
-     * @param  int    $mode
-     * @param  bool   $useSudo
      *
-     * @return Application
+     * @return Command
      */
-    public function getChmodTask($name, $path, $commandPath, $mode = 0777, $useSudo = true)
+    public function getChmodCommand($name)
     {
-        return new Application($name, function(Application $app) use($path, $commandPath, $mode, $useSudo) {
-            $app->getHelper()->runCommand(sprintf(
+        return new Command($name, function(Command $cmd) {
+            $cmd->getHelper()->runCommand(sprintf(
                 '%schmod -R %s %s',
-                ($useSudo) ? 'sudo ' : '',
-                $mode,
-                $path
-            ), $commandPath);
+                ($cmd->getValue('useSudo', false)) ? 'sudo ' : '',
+                $cmd->getValue('mode', 0777),
+                $cmd->requireValue('path')
+            ), $cmd->requireValue('commandPath'));
         });
     }
 
     /**
      * @param  string $name
-     * @param  string $path
-     * @param  string $commandPath
-     * @param  bool $useSudo
      *
-     * @return Application
+     * @return Command
      */
-    public function getRmTask($name, $path, $commandPath, $useSudo = true)
+    public function getRmTask($name)
     {
-        return new Application($name, function(Application $app) use($path, $commandPath, $useSudo) {
-            $app->getHelper()->runCommand(sprintf(
+        return new Command($name, function(Command $cmd) {
+            $cmd->getHelper()->runCommand(sprintf(
                 '%srm -rf %s',
-                ($useSudo) ? 'sudo ' : '',
-                $path
-            ), $commandPath);
+                ($cmd->getValue('useSudo', false)) ? 'sudo ' : '',
+                $cmd->requireValue('path')
+            ), $cmd->requireValue('commandPath'));
         });
     }
 }

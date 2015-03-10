@@ -2,7 +2,7 @@
 
 namespace Hnk\ConsoleApplicationBundle;
 
-class SymfonyApplication extends Application
+class SymfonyCommand extends Command
 {
     /** 
      * @var SymfonyProject 
@@ -11,14 +11,14 @@ class SymfonyApplication extends Application
 
 
     /**
-     * @param string $name
+     * @param string         $name
      * @param SymfonyProject $project
-     * @param callable $handler
-     * @param bool $exitAfterRun
+     * @param callable       $handler
+     * @param array          $settings
      */
-    function __construct($name, SymfonyProject $project, \Closure $handler = null, $exitAfterRun = true)
+    function __construct($name, SymfonyProject $project, \Closure $handler = null, $settings = [])
     {
-        parent::__construct($name, $handler, $exitAfterRun);
+        parent::__construct($name, $handler, $settings);
         $this->symfonyProject = $project;
     }
     

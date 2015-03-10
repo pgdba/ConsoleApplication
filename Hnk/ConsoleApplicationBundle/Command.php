@@ -3,9 +3,9 @@
 namespace Hnk\ConsoleApplicationBundle;
 
 /**
- * @author Jakub Rapacz
+ * @author pgdba
  */
-class Application
+class Command
 {
     /**
      * @var string 
@@ -23,15 +23,22 @@ class Application
     protected $handler = null;
 
     /**
-     * @var Application|null
+     * @var Command|null
      */
     protected $parent = null;
 
     /**
-     * @var bool
+     * @var array
      */
-    protected $exitAfterRun = true;
-    
+    protected $settings = [];
+
+    /**
+     * @var array
+     */
+    private $defaultSettings = [
+        'exitAfterRun' => true,
+    ];
+
     /**
      * @var string 
      */
@@ -40,18 +47,18 @@ class Application
     /**
      * @var array
      */
-    protected $commandOptions = [];
+    protected $values = [];
     
     /**
-     * @param string         $name
-     * @param \Closure|null  $handler
-     * @param bool           $exitAfterRun
+     * @param string        $name
+     * @param \Closure|null $handler
+     * @param array         $settings
      */
-    function __construct($name, \Closure $handler = null, $exitAfterRun = true)
+    function __construct($name, \Closure $handler = null, $settings = [])
     {
         $this->name = $name;
         $this->handler = $handler;
-        $this->exitAfterRun = $exitAfterRun;
+        $this->settings = array_merge($this->defaultSettings, $settings);
     }
     
     /**
@@ -75,7 +82,7 @@ class Application
             $this->runCommand();
         }
 
-        if (false === $this->exitAfterRun && $this->hasParent()) {
+        if (false === $this->getSetting('exitAfterRun', false) && $this->hasParent()) {
             $this->parent->runMenu();
         }
     }
@@ -138,10 +145,10 @@ class Application
     }
     
     /**
-     * @param Application $app
+     * @param Command $app
      * @param string $key
      */
-    public function addChild(Application $app, $key = null)
+    public function addChild(Command $app, $key = null)
     {
         if (null === $key) {
             $key = count($this->children) + 1;
@@ -159,7 +166,7 @@ class Application
     }
     
     /**
-     * @return Application[]
+     * @return Command[]
      */
     public function getChildren()
     {
@@ -167,7 +174,7 @@ class Application
     }
     
     /**
-     * @param Application $parent
+     * @param Command $parent
      */
     function setParent($parent)
     {
@@ -175,7 +182,7 @@ class Application
     }
 
     /**
-     * @return Application|null
+     * @return Command|null
      */
     function getParent()
     {
@@ -189,23 +196,31 @@ class Application
     {
         return (null !== $this->parent);
     }
-    
+
     /**
-     * @return boolean
+     * @param  string     $name
+     * @param  mixed|null $default
+     *
+     * @return mixed
      */
-    public function isExitAfterRun()
+    public function getSetting($name, $default = null)
     {
-        return $this->exitAfterRun;
+        if (!array_key_exists($name, $this->settings)) {
+            return $default;
+        }
+
+        return $this->settings[$name];
     }
-    
-    
+
     /**
-     * @param boolean $exitAfterRun
+     * @param  string $name
+     * @param  mixed  $value
+     *
      * @return $this
      */
-    public function setExitAfterRun($exitAfterRun)
+    public function setSetting($name, $value)
     {
-        $this->exitAfterRun = $exitAfterRun;
+        $this->settings[$name] = $value;
 
         return $this;
     }
@@ -235,7 +250,7 @@ class Application
     }
 
     /**
-     * @param string $description
+     * @param  string $description
      * 
      * @return $this
      */
@@ -249,39 +264,57 @@ class Application
     /**
      * @return array
      */
-    public function getCommandOptions()
+    public function getValues()
     {
-        return $this->commandOptions;
+        return $this->values;
     }
 
     /**
-     * @param string        $name
-     * @param mixed|null    $default
+     * @param  string     $name
+     * @param  mixed|null $default
+     *
      * @return mixed
      */
-    public function getCommandOption($name, $default = null)
+    public function getValue($name, $default = null)
     {
-        if (array_key_exists($name, $this->commandOptions)) {
-            return $this->commandOptions[$name];
+        if (array_key_exists($name, $this->values)) {
+            return $this->values[$name];
         }
+
         return $default;
     }
 
     /**
-     * @param string $name
-     * @param mixed $value
+     * @param  string $name
+     *
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    public function requireValue($name)
+    {
+        if (array_key_exists($name, $this->values)) {
+            return $this->values[$name];
+        }
+
+        throw new \Exception(sprintf('Value %s is required by this command', $name));
+    }
+
+    /**
+     * @param  string $name
+     * @param  mixed $value
      *
      * @return $this
      */
-    public function setCommandOption($name, $value)
+    public function setValue($name, $value)
     {
-        $this->commandOptions[$name] = $value;
+        $this->values[$name] = $value;
 
         return $this;
     }
 
     /**
-     * @param string $name
+     * @param  string $name
      *
      * @return $this
      */
