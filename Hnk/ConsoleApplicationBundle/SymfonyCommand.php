@@ -16,7 +16,7 @@ class SymfonyCommand extends Command
      * @param callable       $handler
      * @param array          $settings
      */
-    function __construct($name, SymfonyProject $project, \Closure $handler = null, $settings = [])
+    function __construct($name, SymfonyProject $project, \Closure $handler = null, $settings = array())
     {
         parent::__construct($name, $handler, $settings);
         $this->symfonyProject = $project;

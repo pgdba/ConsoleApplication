@@ -19,7 +19,7 @@ class Helper
     const COLOR_WHITE = 'white';
     const COLOR_DEFAULT = 'default';
 
-    protected $colorList = [
+    protected $colorList = array(
         self::COLOR_BLACK => "\33[30m",
         self::COLOR_BLUE => "\33[34m",
         self::COLOR_GREEN => "\33[32m",
@@ -30,7 +30,7 @@ class Helper
         self::COLOR_YELLOW => "\33[33m",
         self::COLOR_WHITE => "\33[37m",
         self::COLOR_DEFAULT => "\33[0m"
-    ];
+    );
 
     private static $instance = null;
     
@@ -124,7 +124,7 @@ class Helper
         $default = ($defaultTrue) ? 'y' : 'n';
         $choice = $this->readln($this->decorateText($prompt, 'Green'), $default);
 
-        if (in_array($choice, ['y', 'Y', 'yes', 'YES', 'Yes'])) {
+        if (in_array($choice, array('y', 'Y', 'yes', 'YES', 'Yes'))) {
             return true;
         } else {
             return false;
@@ -172,7 +172,7 @@ class Helper
     {
         $dir = rtrim($dir, '/') . '/';
         
-        $files = [];
+        $files = array();
         if (is_dir($dir)) {
             $handler = opendir($dir);
             while (false !== ($file = readdir($handler))) {

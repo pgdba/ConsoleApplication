@@ -89,7 +89,7 @@ class SymfonyHelper extends Helper {
      */
     public function getBundles($srcDir) 
     {
-        $bundles = [];
+        $bundles = array();
         $this->recurrentBundleFinder($srcDir, $bundles);
 
         return $bundles;
@@ -127,7 +127,7 @@ class SymfonyHelper extends Helper {
 
             if (file_exists($srcDir . $path . $bundleName . '.php')) { // TODO - create more sophisticated hack
                 $key = count($bundles) + 1;
-                $bundles[$key] = ['name' => $bundleName, 'path' => $path];
+                $bundles[$key] = array('name' => $bundleName, 'path' => $path);
                 return;
             } else {
                 $files = $this->getFilesInDir($srcDir . $path, true);

@@ -15,7 +15,7 @@ class Command
     /**
      * @var array
      */
-    protected $children = [];
+    protected $children = array();
     
     /**
      * @var \Closure|null
@@ -30,14 +30,14 @@ class Command
     /**
      * @var array
      */
-    protected $settings = [];
+    protected $settings = array();
 
     /**
      * @var array
      */
-    private $defaultSettings = [
+    private $defaultSettings = array(
         'exitAfterRun' => true,
-    ];
+    );
 
     /**
      * @var string 
@@ -47,14 +47,14 @@ class Command
     /**
      * @var array
      */
-    protected $values = [];
+    protected $values = array();
     
     /**
      * @param string        $name
      * @param \Closure|null $handler
      * @param array         $settings
      */
-    function __construct($name, \Closure $handler = null, $settings = [])
+    function __construct($name, \Closure $handler = null, $settings = array())
     {
         $this->name = $name;
         $this->handler = $handler;

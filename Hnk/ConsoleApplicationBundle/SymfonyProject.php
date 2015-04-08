@@ -11,23 +11,23 @@ class SymfonyProject extends Project {
     /**
      * @var array
      */
-    protected $bundles = [];
+    protected $bundles = array();
 
     /**
      * @var array 
      */
-    protected $environments = [
+    protected $environments = array(
         1 => 'dev', 
         2 => 'prod', 
         3 => 'test'
-    ];
+    );
 
     /**
      * @var array
      */
-    protected $isLoaded = [
+    protected $isLoaded = array(
         'bundles' => false
-    ];
+    );
 
     /**
      * @var string
