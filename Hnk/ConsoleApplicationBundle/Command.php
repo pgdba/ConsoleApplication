@@ -324,4 +324,14 @@ class Command
 
         return $this;
     }
+
+    /**
+     * @param mixed $command
+     *
+     * @return bool
+     */
+    public function equals($command)
+    {
+        return $this === $command;
+    }
 }
