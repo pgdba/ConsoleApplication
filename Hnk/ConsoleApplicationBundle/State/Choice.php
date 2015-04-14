@@ -1,6 +1,7 @@
 <?php
 
 namespace Hnk\ConsoleApplicationBundle\State;
+
 use Hnk\ConsoleApplicationBundle\Command;
 
 /**
