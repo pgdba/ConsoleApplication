@@ -37,7 +37,7 @@ class SymfonyProject extends Project {
     /**
      * @param string $name
      * @param string $path
-     * @throws Exception
+     * @throws \Exception
      */
     function __construct($name, $path)
     {
@@ -45,7 +45,7 @@ class SymfonyProject extends Project {
         
         $srcPath = $this->path.'/src';
         if (!is_dir($srcPath)) {
-            throw new Exception(sprintf('Cannot find src directory in path %s', $this->path));
+            throw new \Exception(sprintf('Cannot find src directory in path %s', $this->path));
         }
         $this->srcPath = $srcPath;
     }

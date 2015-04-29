@@ -7,7 +7,7 @@ class TaskHelper
     /**
      * @var TaskHelper
      */
-    private static $instance = null;
+    protected static $instance = null;
 
     /**
      * @return TaskHelper
