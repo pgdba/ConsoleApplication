@@ -11,7 +11,18 @@ class Command
      * @var string 
      */
     protected $name;
-    
+
+    /**
+     * @var string
+     */
+    protected $description;
+
+    /**
+     * @var array
+     */
+    protected $values = array();
+
+
     /**
      * @var array
      */
@@ -39,15 +50,9 @@ class Command
         'exitAfterRun' => true,
     );
 
-    /**
-     * @var string 
-     */
-    protected $description = '';
 
-    /**
-     * @var array
-     */
-    protected $values = array();
+
+
     
     /**
      * @param string        $name

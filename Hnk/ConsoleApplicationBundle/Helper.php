@@ -95,8 +95,12 @@ class Helper
      * @param string|null $default
      * @return null|string
      */
-    public function readln($prompt = 'Choose:', $default = null)
+    public function readln($prompt = 'Choose:', $default = null, $promptColor = null)
     {
+        if (null !== $promptColor) {
+            $prompt = self::decorateText($prompt, $promptColor);
+        }
+
         if ($default !== null) {
             $prompt = sprintf("%s [%s]", $prompt, $this->decorateText($default, self::COLOR_YELLOW));
         }
