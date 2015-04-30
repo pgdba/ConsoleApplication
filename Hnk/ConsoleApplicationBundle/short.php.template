@@ -1,12 +1,12 @@
 #!/usr/bin/php
 <?php
 
-use Hnk\ConsoleApplicationBundle\Task\TaskGroup;
+use Hnk\ConsoleApplicationBundle\App;
 
 require_once __DIR__ . '/bootstrap.php';
 
 // main application definition
-$mainApp = new TaskGroup('ConsoleApplication');
+$mainApp = new App('ConsoleApplication');
 
 // define your commands here
 

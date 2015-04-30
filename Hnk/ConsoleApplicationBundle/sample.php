@@ -1,6 +1,7 @@
 #!/usr/bin/php
 <?php
 
+use Hnk\ConsoleApplicationBundle\App;
 use Hnk\ConsoleApplicationBundle\Helper\RenderHelper;
 use Hnk\ConsoleApplicationBundle\Symfony\Project;
 use Hnk\ConsoleApplicationBundle\Symfony\SymfonyTask;
@@ -11,8 +12,8 @@ use Hnk\ConsoleApplicationBundle\Task\TaskGroup;
 require_once __DIR__ . '/bootstrap.php';
 
 // main application definition
-$mainApp = new TaskGroup('ConsoleApplication');
-$mainApp->setDescription(sprintf('Sample console application.%sBuild You\'re commands in file %s and run them from the menu below.', PHP_EOL, __FILE__));
+$mainApp = new App('ConsoleApplication');
+//$mainApp->setDescription(sprintf('Sample console application.%sBuild You\'re commands in file %s and run them from the menu below.', PHP_EOL, __FILE__));
 
 // basic command definition
 $mainApp->addTask(new Task('pwd', function(Task $task) {
@@ -26,14 +27,14 @@ $lsApp->addTask(new Task('ls in HNK_CONSOLE_APPLICATION_BASE_DIR', function($a){
 $mainApp->addTask($lsApp, 2);
 
 // symfony project
-$bookingProject = new Project('booking', '/home/unenc/booking/git/bookings-api');
-$mainApp->addTask(new SymfonyTask('cache clear', $bookingProject, function(SymfonyTask $a){
-    $env = $a->getHelper()->renderEnvironmentChoice($a->getProject()->getBundles(), 'dev');
-//    $a->runConsoleCommand(sprintf('cache:clear --env=%s', $env));
-    $bundle = $a->getHelper()->renderBundleChoice($a->getProject()->getBundles(), 'AccountApiBundle');
-    
-    RenderHelper::println(sprintf('Env: %s, bundle: %s', $env, $bundle['name']));
-    $a->getHelper()->renderConfirm();
-}));
+//$bookingProject = new Project('booking', '/home/unenc/booking/git/bookings-api');
+//$mainApp->addTask(new SymfonyTask('cache clear', $bookingProject, function(SymfonyTask $a){
+//    $env = $a->getHelper()->renderEnvironmentChoice($a->getProject()->getBundles(), 'dev');
+////    $a->runConsoleCommand(sprintf('cache:clear --env=%s', $env));
+//    $bundle = $a->getHelper()->renderBundleChoice($a->getProject()->getBundles(), 'AccountApiBundle');
+//
+//    RenderHelper::println(sprintf('Env: %s, bundle: %s', $env, $bundle['name']));
+//    $a->getHelper()->renderConfirm();
+//}));
 
 $mainApp->run();

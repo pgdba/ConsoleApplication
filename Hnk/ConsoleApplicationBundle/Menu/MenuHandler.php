@@ -36,6 +36,7 @@ class MenuHandler
             throw new \Exception('No items'); // todo
         }
 
+        RenderHelper::println();
         RenderHelper::println('Available options:');
 
         /** @var MenuItemInterface $item */
@@ -44,7 +45,9 @@ class MenuHandler
         }
         RenderHelper::println(sprintf(' * exit: %s', RenderHelper::decorateText('<enter>', RenderHelper::COLOR_YELLOW)));
 
+        RenderHelper::println();
         $choice = $this->helper->renderChoice('Choose:', $defaultChoice);
+        RenderHelper::println();
 
         if (RenderHelper::isEnter($choice)) {
             return null;

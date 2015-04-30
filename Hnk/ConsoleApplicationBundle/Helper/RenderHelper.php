@@ -36,7 +36,7 @@ class RenderHelper
      */
     public static function println($text = '')
     {
-        return $text . PHP_EOL;
+        echo $text . PHP_EOL;
     }
 
     /**
