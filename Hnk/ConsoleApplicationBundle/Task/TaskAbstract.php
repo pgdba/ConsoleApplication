@@ -117,15 +117,14 @@ abstract class TaskAbstract implements MenuItemInterface
 
     /**
      * @param  string $key
-     * @param  mixed  $defaultValue
      *
      * @return mixed
      *
      * @throws \Exception
      */
-    public function requireOption($key, $defaultValue = null)
+    public function requireOption($key)
     {
-        return $this->getOption($key, $defaultValue, true);
+        return $this->getOption($key, null, true);
     }
 
     /**
