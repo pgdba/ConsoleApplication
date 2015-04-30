@@ -28,6 +28,11 @@ abstract class TaskAbstract implements MenuItemInterface
     protected $parent;
 
     /**
+     * @var TaskHelper
+     */
+    protected $helper;
+
+    /**
      * @param string       $name
      * @param array        $options
      * @param string       $description
@@ -39,6 +44,7 @@ abstract class TaskAbstract implements MenuItemInterface
         $this->options = $options;
         $this->description = $description;
         $this->parent = null;
+        $this->helper = TaskHelper::getInstance();
     }
 
     /**
@@ -180,6 +186,6 @@ abstract class TaskAbstract implements MenuItemInterface
      */
     public function getHelper()
     {
-        return TaskHelper::getInstance();
+        return $this->helper;
     }
 }

@@ -13,6 +13,10 @@ abstract class SymfonyCommonTask extends CommonTask implements ProjectAwareInter
     protected $project;
 
     /**
+     * @var TaskHelper
+     */
+    protected $helper;
+    /**
      * @param string       $name
      * @param Project      $project
      * @param array        $options
@@ -24,6 +28,7 @@ abstract class SymfonyCommonTask extends CommonTask implements ProjectAwareInter
         parent::__construct($name, $options, $description, $parent);
 
         $this->project = $project;
+        $this->helper = TaskHelper::getInstance();
     }
 
     /**
@@ -32,5 +37,13 @@ abstract class SymfonyCommonTask extends CommonTask implements ProjectAwareInter
     public function getProject()
     {
         return $this->project;
+    }
+
+    /**
+     * @return TaskHelper
+     */
+    public function getHelper()
+    {
+        return $this->helper;
     }
 }
