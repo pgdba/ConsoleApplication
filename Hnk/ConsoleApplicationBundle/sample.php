@@ -1,40 +1,41 @@
 #!/usr/bin/php
 <?php
 
-use Hnk\ConsoleApplicationBundle\Command;
-use Hnk\ConsoleApplicationBundle\SymfonyCommand;
-use Hnk\ConsoleApplicationBundle\SymfonyProject;
+use Hnk\ConsoleApplicationBundle\App;
+use Hnk\ConsoleApplicationBundle\Helper\RenderHelper;
+use Hnk\ConsoleApplicationBundle\Symfony\Project;
+use Hnk\ConsoleApplicationBundle\Symfony\SymfonyTask;
+use Hnk\ConsoleApplicationBundle\Task\Task;
+use Hnk\ConsoleApplicationBundle\Task\TaskGroup;
+
 
 require_once __DIR__ . '/bootstrap.php';
 
 // main application definition
-$mainApp = new Command('ConsoleApplication');
+$app = new App();
+$mainApp = new TaskGroup('ConsoleApplication');
 $mainApp->setDescription(sprintf('Sample console application.%sBuild You\'re commands in file %s and run them from the menu below.', PHP_EOL, __FILE__));
-
+$app->setTask($mainApp);
 // basic command definition
-$mainApp->addChild((new Command(
-        'pwd', 
-        function(Command $a) {
-            $a->getHelper()->runCommand('pwd', APP_DIR);
-        }
-    ))->setDescription('Runs pwd on ConsoleApplicationBundle directory')
-    , 1);
+$mainApp->addTask(new Task('pwd', function(Task $task) {
+    $task->getHelper()->runCommand('pwd', HNK_CONSOLE_APPLICATION_APP_DIR);
+}, array(), 'Runs pwd on ConsoleApplicationBundle directory'));
 
 // more advanced command
-$lsApp = new Command('ls');
-$lsApp->addChild(new Command('ls in APP_DIR', function($a){$a->getHelper()->runCommand('ls', APP_DIR);}, false), 1);
-$lsApp->addChild(new Command('ls in BASE_DIR', function($a){$a->getHelper()->runCommand('ls', BASE_DIR);}, false), 2);
-$mainApp->addChild($lsApp, 2);    
+$lsApp = new TaskGroup('ls');
+$lsApp->addTask(new Task('ls in HNK_CONSOLE_APPLICATION_APP_DIR', function($a){$a->getHelper()->runCommand('ls', HNK_CONSOLE_APPLICATION_APP_DIR);}, false), 1);
+$lsApp->addTask(new Task('ls in HNK_CONSOLE_APPLICATION_BASE_DIR', function($a){$a->getHelper()->runCommand('ls', HNK_CONSOLE_APPLICATION_BASE_DIR);}, false), 2);
+$mainApp->addTask($lsApp, 2);
 
 // symfony project
-$bookingProject = new SymfonyProject('booking', '/home/unenc/booking/git/bookings-api');
-$mainApp->addChild(new SymfonyCommand('cache clear', $bookingProject, function(SymfonyCommand $a){
-    $env = $a->renderEnvironmentChoice('dev');
-//    $a->runConsoleCommand(sprintf('cache:clear --env=%s', $env));
-    $bundle = $a->renderBundleChoice('AccountApiBundle');
-    
-    $a->getHelper()->println(sprintf('Env: %s, bundle: %s', $env, $bundle['name']));
-    $a->getHelper()->renderConfirm();
-}));
+//$bookingProject = new Project('booking', '/home/unenc/booking/git/bookings-api');
+//$mainApp->addTask(new SymfonyTask('cache clear', $bookingProject, function(SymfonyTask $a){
+//    $env = $a->getHelper()->renderEnvironmentChoice($a->getProject()->getBundles(), 'dev');
+////    $a->runConsoleCommand(sprintf('cache:clear --env=%s', $env));
+//    $bundle = $a->getHelper()->renderBundleChoice($a->getProject()->getBundles(), 'AccountApiBundle');
+//
+//    RenderHelper::println(sprintf('Env: %s, bundle: %s', $env, $bundle['name']));
+//    $a->getHelper()->renderConfirm();
+//}));
 
-$mainApp->run();
+$app->run();

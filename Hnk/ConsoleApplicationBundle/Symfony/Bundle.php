@@ -1,11 +1,10 @@
 <?php
 
-namespace Hnk\ConsoleApplicationBundle;
+namespace Hnk\ConsoleApplicationBundle\Symfony;
 
-/**
- * @author Jakub Rapacz
- */
-class Project
+use Hnk\ConsoleApplicationBundle\Menu\MenuItemInterface;
+
+class Bundle implements MenuItemInterface
 {
     /**
      * @var string
@@ -21,7 +20,7 @@ class Project
      * @param string $name
      * @param string $path
      */
-    function __construct($name, $path)
+    public function __construct($name, $path)
     {
         $this->name = $name;
         $this->path = $path;
@@ -36,11 +35,15 @@ class Project
     }
 
     /**
-     * @param string $name
+     * @param  string $name
+     *
+     * @return $this
      */
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -52,11 +55,14 @@ class Project
     }
 
     /**
-     * @param string $path
+     * @param  string $path
+     *
+     * @return $this
      */
     public function setPath($path)
     {
         $this->path = $path;
-    }
 
-} 
+        return $this;
+    }
+}
