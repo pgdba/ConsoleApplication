@@ -187,4 +187,14 @@ abstract class TaskAbstract implements MenuItemInterface
     {
         return $this->helper;
     }
+
+    /**
+     * @param mixed $task
+     *
+     * @return bool
+     */
+    public function equals($task)
+    {
+        return $task === $this;
+    }
 }

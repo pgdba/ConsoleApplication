@@ -2,7 +2,7 @@
 
 namespace Hnk\ConsoleApplicationBundle\State;
 
-use Hnk\ConsoleApplicationBundle\Command;
+use Hnk\ConsoleApplicationBundle\Task\TaskAbstract;
 
 /**
  * @author pgdba
@@ -20,9 +20,9 @@ class Choice
     protected $child;
 
     /**
-     * @var Command
+     * @var TaskAbstract
      */
-    protected $command;
+    protected $task;
 
     /**
      * @return Choice|null
@@ -71,19 +71,19 @@ class Choice
     /**
      * @return Command
      */
-    public function getCommand()
+    public function getTask()
     {
-        return $this->command;
+        return $this->task;
     }
 
     /**
-     * @param  Command $command
+     * @param  Command $task
      *
      * @return $this
      */
-    public function setCommand($command)
+    public function setTask($task)
     {
-        $this->command = $command;
+        $this->task = $task;
 
         return $this;
     }
@@ -107,9 +107,9 @@ class Choice
     /**
      * @return bool
      */
-    public function hasCommand()
+    public function hasTask()
     {
-        return null !== $this->command;
+        return null !== $this->task;
     }
 
     /**
@@ -138,11 +138,11 @@ class Choice
             return false;
         }
 
-        if ($this->hasCommand()) {
-            if (false === $this->getCommand()->equals($choice->getCommand())) {
+        if ($this->hasTask()) {
+            if (false === $this->getTask()->equals($choice->getTask())) {
                 return false;
             }
-        } elseif ($choice->hasCommand()) {
+        } elseif ($choice->hasTask()) {
             return false;
         }
 
