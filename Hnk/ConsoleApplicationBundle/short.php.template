@@ -2,12 +2,18 @@
 <?php
 
 use Hnk\ConsoleApplicationBundle\App;
+use Hnk\ConsoleApplicationBundle\Task\TaskGroup;
 
 require_once __DIR__ . '/bootstrap.php';
 
 // main application definition
-$mainApp = new App('ConsoleApplication');
+$mainApp = new App();
+
+// task group wrapper
+$mainGroup = new TaskGroup('ConsoleApplication');
+$mainApp->setTask($mainGroup);
 
 // define your commands here
+//$mainGroup->addTask(...);
 
 $mainApp->run();

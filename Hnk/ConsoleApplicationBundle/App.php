@@ -7,31 +7,21 @@ use Hnk\ConsoleApplicationBundle\Helper\TaskHelper;
 use Hnk\ConsoleApplicationBundle\Menu\MenuHandler;
 use Hnk\ConsoleApplicationBundle\Menu\MenuProviderInterface;
 use Hnk\ConsoleApplicationBundle\Task\RunnableTaskInterface;
-use Hnk\ConsoleApplicationBundle\Task\Task;
 use Hnk\ConsoleApplicationBundle\Task\TaskAbstract;
-use Hnk\ConsoleApplicationBundle\Task\TaskGroup;
 
 class App
 {
     /**
-     * @var TaskGroup
+     * @var TaskAbstract
      */
-    protected $tasksGroup;
-
-    /**
-     * @param $name
-     */
-    public function __construct($name)
-    {
-        $this->tasksGroup = new TaskGroup($name);
-    }
+    protected $task;
 
     /**
      *
      */
     public function run()
     {
-        $this->handleTask($this->tasksGroup);
+        $this->handleTask($this->task);
     }
 
     /**
@@ -72,13 +62,12 @@ class App
 
     /**
      * @param  TaskAbstract $task
-     * @param  string       $key
      *
      * @return $this
      */
-    public function addTask(TaskAbstract $task, $key = null)
+    public function setTask(TaskAbstract $task)
     {
-        $this->tasksGroup->addTask($task, $key);
+        $this->task = $task;
 
         return $this;
     }

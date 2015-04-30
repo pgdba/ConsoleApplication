@@ -12,9 +12,10 @@ use Hnk\ConsoleApplicationBundle\Task\TaskGroup;
 require_once __DIR__ . '/bootstrap.php';
 
 // main application definition
-$mainApp = new App('ConsoleApplication');
-//$mainApp->setDescription(sprintf('Sample console application.%sBuild You\'re commands in file %s and run them from the menu below.', PHP_EOL, __FILE__));
-
+$app = new App();
+$mainApp = new TaskGroup('ConsoleApplication');
+$mainApp->setDescription(sprintf('Sample console application.%sBuild You\'re commands in file %s and run them from the menu below.', PHP_EOL, __FILE__));
+$app->setTask($mainApp);
 // basic command definition
 $mainApp->addTask(new Task('pwd', function(Task $task) {
     $task->getHelper()->runCommand('pwd', HNK_CONSOLE_APPLICATION_APP_DIR);
@@ -37,4 +38,4 @@ $mainApp->addTask($lsApp, 2);
 //    $a->getHelper()->renderConfirm();
 //}));
 
-$mainApp->run();
+$app->run();
