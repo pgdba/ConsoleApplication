@@ -69,4 +69,25 @@ class Project
     {
         return $this->environments;
     }
+
+    /**
+     * @return string
+     */
+    public function getSrcPath()
+    {
+        return $this->srcPath;
+    }
+
+    /**
+     * @param  string $key
+     * @param  string $name
+     *
+     * @return $this
+     */
+    public function addEnvironment($key, $name)
+    {
+        $this->environments[$key] = $name;
+
+        return $this;
+    }
 }

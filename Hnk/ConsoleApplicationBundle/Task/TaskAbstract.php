@@ -2,6 +2,7 @@
 
 namespace Hnk\ConsoleApplicationBundle\Task;
 
+use Hnk\ConsoleApplicationBundle\Helper\TaskHelper;
 use Hnk\ConsoleApplicationBundle\Menu\MenuItemInterface;
 
 abstract class TaskAbstract implements MenuItemInterface
@@ -172,5 +173,13 @@ abstract class TaskAbstract implements MenuItemInterface
     public function hasParent()
     {
         return ($this->parent instanceof TaskAbstract);
+    }
+
+    /**
+     * @return TaskHelper
+     */
+    public function getHelper()
+    {
+        return TaskHelper::getInstance();
     }
 }

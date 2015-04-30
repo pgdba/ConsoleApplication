@@ -36,4 +36,33 @@ class TaskHelper extends BaseTaskHelper
             return false;
         }
     }
+
+    /**
+     * @param  array  $environments
+     * @param  string $defaultEnvironment
+     *
+     * @return bool
+     */
+    public function renderEnvironmentChoice(array $environments, $defaultEnvironment = null)
+    {
+        $defaultChoice = null;
+
+        RenderHelper::println('Available environments:');
+        foreach ($environments as $key => $env) {
+            RenderHelper::println(sprintf(" * %s: %s", $env, RenderHelper::decorateText($key, RenderHelper::COLOR_YELLOW)));
+            if ($env == $defaultEnvironment) {
+                $defaultChoice = $key;
+            }
+        }
+
+        RenderHelper::println();
+        $choice = $this->renderChoice("Choose environment:", $defaultChoice);
+        RenderHelper::println();
+
+        if (array_key_exists($choice, $environments)) {
+            return $environments[$choice];
+        } else {
+            return false;
+        }
+    }
 }
