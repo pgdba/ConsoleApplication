@@ -1,43 +1,50 @@
 <?php
-/**
- * @author Jakub Rapacz <j.rapacz@tvn.pl>
- */
 
 namespace Hnk\ConsoleApplicationBundle\Task;
 
-
-class CommonTask
+abstract class CommonTask extends TaskAbstract implements RunnableTaskInterface
 {
     /**
-     * @param  string $name
+     * Task base name - e.g. 'vagrant up' or 'cache clear'
      *
-     * @return Command
+     * Having BASE_NAME -> 'cache clear' and $name -> 'in my project', getName will return 'cache clear in my project'
+     *
      */
-    public function getChmodCommand($name)
+    const BASE_NAME = '';
+
+    /**
+     * @param string       $name
+     * @param array        $options
+     * @param string       $description
+     * @param TaskAbstract $parent
+     */
+    public function __construct($name = '', $options = array(), $description = '', TaskAbstract $parent = null)
     {
-        return new Command($name, function(Command $cmd) {
-            $cmd->getHelper()->runCommand(sprintf(
-                '%schmod -R %s %s',
-                ($cmd->getValue('useSudo', false)) ? 'sudo ' : '',
-                $cmd->getValue('mode', 0777),
-                $cmd->requireValue('path')
-            ), $cmd->requireValue('commandPath'));
-        });
+        parent::__construct($name, $options, $description, $parent);
     }
 
     /**
-     * @param  string $name
-     *
-     * @return Command
+     * @return null
      */
-    public function getRmTask($name)
+    abstract public function handler();
+
+    /**
+     * @return string
+     */
+    public function getName()
     {
-        return new Command($name, function(Command $cmd) {
-            $cmd->getHelper()->runCommand(sprintf(
-                '%srm -rf %s',
-                ($cmd->getValue('useSudo', false)) ? 'sudo ' : '',
-                $cmd->requireValue('path')
-            ), $cmd->requireValue('commandPath'));
-        });
+        if ('' !== static::BASE_NAME) {
+            return static::BASE_NAME . ' '. $this->name;
+        }
+
+        return $this->name;
+    }
+
+    /**
+     * @return null
+     */
+    public function run()
+    {
+        $this->handler();
     }
 }

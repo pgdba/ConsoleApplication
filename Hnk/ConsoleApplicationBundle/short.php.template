@@ -1,15 +1,19 @@
 #!/usr/bin/php
 <?php
 
-use Hnk\ConsoleApplicationBundle\Command;
-use Hnk\ConsoleApplicationBundle\SymfonyCommand;
-use Hnk\ConsoleApplicationBundle\SymfonyProject;
+use Hnk\ConsoleApplicationBundle\App;
+use Hnk\ConsoleApplicationBundle\Task\TaskGroup;
 
 require_once __DIR__ . '/bootstrap.php';
 
 // main application definition
-$mainApp = new Command('ConsoleApplication');
+$mainApp = new App();
+
+// task group wrapper
+$mainGroup = new TaskGroup('ConsoleApplication');
+$mainApp->setTask($mainGroup);
 
 // define your commands here
+//$mainGroup->addTask(...);
 
 $mainApp->run();
