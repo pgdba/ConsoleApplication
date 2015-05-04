@@ -9,24 +9,23 @@ use Hnk\ConsoleApplicationBundle\Menu\MenuProviderInterface;
 class TaskGroup extends TaskAbstract implements MenuProviderInterface
 {
     /**
-     * @var array
+     * @var TaskIdentifier[]
      */
     protected $tasks = array();
 
     /**\
-     * @param  TaskAbstract $task
-     * @param  string       $key
+     * @param  TaskIdentifier $task
+     * @param  string         $key
      *
      * @return $this
      */
-    public function addTask(TaskAbstract $task, $key = null)
+    public function addTask(TaskIdentifier $task, $key = null)
     {
         if (!$key || false === (is_string($key) || is_numeric($key))) {
             $key = count($this->tasks) + 1;
         }
 
         $this->tasks[$key] = $task;
-        $task->setParent($this);
 
         return $this;
     }
@@ -54,7 +53,7 @@ class TaskGroup extends TaskAbstract implements MenuProviderInterface
      *
      * @param  string $choice
      *
-     * @return TaskAbstract
+     * @return TaskIdentifier
      *
      * @throws UnknownMenuItemException
      */

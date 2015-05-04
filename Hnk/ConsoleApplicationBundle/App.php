@@ -12,6 +12,9 @@ use Hnk\ConsoleApplicationBundle\State\State;
 use Hnk\ConsoleApplicationBundle\State\StateManager;
 use Hnk\ConsoleApplicationBundle\Task\RunnableTaskInterface;
 use Hnk\ConsoleApplicationBundle\Task\TaskAbstract;
+use Hnk\ConsoleApplicationBundle\Task\TaskIdentifier;
+use Hnk\ConsoleApplicationBundle\Task\TaskRepository;
+use Hnk\ConsoleApplicationBundle\Task\TaskRepositoryFactory;
 
 class App
 {
@@ -35,6 +38,16 @@ class App
      */
     protected $stateManager;
 
+    /**
+     * @var TaskRepository
+     */
+    protected $taskRepository;
+
+    /**
+     * @var TaskHelper
+     */
+    protected $taskHelper;
+    
     public function __construct()
     {
         $cacheFile = __DIR__ .'/.hcaCache';
@@ -43,7 +56,12 @@ class App
 
         $this->stateManager = new StateManager(array('saveFile' => $cacheFile));
         $this->state = $this->stateManager->getState();
+
+        $taskRepositoryFactory = new TaskRepositoryFactory();
+        $this->taskRepository = $taskRepositoryFactory->getTaskRepository();
+        $this->taskHelper = TaskHelper::getInstance();
     }
+
 
     /**
      *
@@ -60,15 +78,10 @@ class App
      */
     protected function handleTask(TaskAbstract $task)
     {
-        RenderHelper::println();
-        RenderHelper::println(RenderHelper::decorateText($task->getName(), RenderHelper::COLOR_GREEN));
-        if ($task->getDescription()) {
-            RenderHelper::println($task->getDescription());
-        }
-        RenderHelper::println();
+        $this->taskHelper->renderTaskHeader($task->getName(), $task->getDescription());
 
         if ($task instanceof MenuProviderInterface) {
-            $menuHandler = new MenuHandler(TaskHelper::getInstance());
+            $menuHandler = new MenuHandler($this->taskHelper);
 
             if ($lastChoice = $this->state->getChoiceStack()->getFirst()) {
                 $lastTask = $lastChoice->getChoiceTask()
@@ -78,9 +91,10 @@ class App
 
             $selectedItem = $menuHandler->handle($task);
 
-            if ($selectedItem instanceof TaskAbstract) {
+            if ($selectedItem instanceof TaskIdentifier) {
+                $selectedTask = $this->taskRepository->getTask($selectedItem);
+                $this->handleTask($selectedTask);
                 $this->handleChoice($selectedItem);
-                $this->handleTask($selectedItem);
             }
 
             if (null === $selectedItem) {
@@ -124,5 +138,13 @@ class App
     {
         $this->state->getChoiceStack()->addChoice($this->choice);
         $this->stateManager->saveState($this->state);
+    }
+
+    /**
+     * @return TaskRepository
+     */
+    public function getTaskRepository()
+    {
+        return $this->taskRepository;
     }
 }
