@@ -197,4 +197,12 @@ abstract class TaskAbstract implements MenuItemInterface
     {
         return $task === $this;
     }
+
+    /**
+     * @return array
+     */
+    public function getMenuOptions()
+    {
+        return (isset($this->options['menuOptions'])) ? $this->options['menuOptions'] : array();
+    }
 }

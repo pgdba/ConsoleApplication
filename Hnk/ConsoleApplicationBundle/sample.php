@@ -10,6 +10,22 @@ use Hnk\ConsoleApplicationBundle\Task\TaskGroup;
 
 
 require_once __DIR__ . '/bootstrap.php';
+//
+//$ti1 = new \Hnk\ConsoleApplicationBundle\Task\TaskIdentifier('1', '1');
+//$ti2 = new \Hnk\ConsoleApplicationBundle\Task\TaskIdentifier('2', '2');
+//$ti3 = new \Hnk\ConsoleApplicationBundle\Task\TaskIdentifier('3', '3');
+//
+//$c = new \Hnk\ConsoleApplicationBundle\State\Choice();
+//$c->setTask($ti1);
+//
+//$c2 = new \Hnk\ConsoleApplicationBundle\State\Choice();
+//$c2->setTask($ti2);
+//$c2->setParent($c);
+//ed($c2);
+//$c = $c2;
+//
+//ed($c);
+
 
 // main application definition
 $app = new App();
@@ -27,6 +43,10 @@ $mainApp->addTask($app->getTaskRepository()->storeTask(new Task('pwd', function(
 $lsApp = new TaskGroup('ls');
 $lsApp->addTask($app->getTaskRepository()->storeTask(new Task('ls in HNK_CONSOLE_APPLICATION_APP_DIR', function($a){$a->getHelper()->runCommand('ls', HNK_CONSOLE_APPLICATION_APP_DIR);})), 1);
 $lsApp->addTask($app->getTaskRepository()->storeTask(new Task('ls in HNK_CONSOLE_APPLICATION_BASE_DIR', function($a){$a->getHelper()->runCommand('ls', HNK_CONSOLE_APPLICATION_BASE_DIR);})), 2);
+
+$deeperLs = new TaskGroup('deeper ls');
+$deeperLs->addTask($app->getTaskRepository()->storeTask(new Task('deeper ls', function($a){$a->getHelper()->runCommand('ls');})));
+$lsApp->addTask($app->getTaskRepository()->storeTask($deeperLs));
 $mainApp->addTask($app->getTaskRepository()->storeTask($lsApp), 2);
 
 // symfony project

@@ -3,6 +3,7 @@
 namespace Hnk\ConsoleApplicationBundle\State;
 
 use Hnk\ConsoleApplicationBundle\Task\TaskAbstract;
+use Hnk\ConsoleApplicationBundle\Task\TaskIdentifier;
 
 /**
  * @author pgdba
@@ -20,7 +21,7 @@ class Choice
     protected $child;
 
     /**
-     * @var TaskAbstract
+     * @var TaskIdentifier
      */
     protected $task;
 
@@ -42,7 +43,7 @@ class Choice
     public function setParent($parent)
     {
         $this->parent = $parent;
-        $this->parent->setChild($this);
+//        $this->parent->setChild($this);
 
         return $this;
     }
@@ -53,6 +54,29 @@ class Choice
     public function getChild()
     {
         return $this->child;
+    }
+
+    /**
+     * @return Choice
+     */
+    public function getLastChild()
+    {
+        if ($this->hasChild()) {
+            return $this->child->getLastChild();
+        }
+
+        return $this;
+    }
+
+    public function removeLastChoiceTask()
+    {
+        if ($this->hasChild()) {
+            return $this->child->removeLastChoiceTask();
+        }
+
+        $this->task = null;
+
+        return $this;
     }
 
     /**
@@ -70,7 +94,7 @@ class Choice
     }
 
     /**
-     * @return Command
+     * @return TaskIdentifier
      */
     public function getTask()
     {
@@ -78,11 +102,11 @@ class Choice
     }
 
     /**
-     * @param  Command $task
+     * @param  TaskIdentifier $task
      *
      * @return $this
      */
-    public function setTask($task)
+    public function setTask(TaskIdentifier $task)
     {
         $this->task = $task;
 
@@ -155,13 +179,11 @@ class Choice
      */
     public function getChoiceName()
     {
-        $name = '';
+        $name = $this->task->getName();
 
         if ($this->hasChild()) {
-            $name = $this->child->getChoiceName() . ' > ';
+            $name .= ' > ' . $this->child->getChoiceName();
         }
-
-        $name .= $this->task->getName();
 
         return $name;
     }
@@ -176,5 +198,14 @@ class Choice
         }
 
         return $this->task;
+    }
+
+    public function getPreviousTaskId($taskId = null)
+    {
+        if ($this->hasChild()) {
+            return $this->child->getPreviousTaskId($this->task->getId());
+        }
+
+        return $taskId;
     }
 }

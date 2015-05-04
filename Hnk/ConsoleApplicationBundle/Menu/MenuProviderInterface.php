@@ -36,8 +36,9 @@ interface MenuProviderInterface
 
     /**
      * @param  MenuItemInterface $item
+     * @param  null              $key
      *
      * @return $this
      */
-    public function addItem(MenuItemInterface $item);
+    public function addItem(MenuItemInterface $item, $key = null);
 }

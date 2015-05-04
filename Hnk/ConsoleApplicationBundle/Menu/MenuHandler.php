@@ -41,7 +41,16 @@ class MenuHandler
 
         /** @var MenuItemInterface $item */
         foreach ($items as $key => $item) {
-            RenderHelper::println(sprintf(' * %s: %s', $item->getName(), RenderHelper::decorateText($key, RenderHelper::COLOR_YELLOW)));
+            $options = $item->getMenuOptions();
+            if (isset($options['extraSpace'])) {
+                RenderHelper::println();
+            }
+            $label = $item->getName();
+            if (isset($options['menuLabel'])) {
+                $label = $options['menuLabel'] .$label;
+            }
+
+            RenderHelper::println(sprintf(' * %s: %s', $label, RenderHelper::decorateText($key, RenderHelper::COLOR_YELLOW)));
         }
         RenderHelper::println(sprintf(' * exit: %s', RenderHelper::decorateText('<enter>', RenderHelper::COLOR_YELLOW)));
 

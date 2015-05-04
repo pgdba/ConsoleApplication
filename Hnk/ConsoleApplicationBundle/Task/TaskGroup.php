@@ -68,12 +68,13 @@ class TaskGroup extends TaskAbstract implements MenuProviderInterface
 
     /**
      * @param  MenuItemInterface $item
+     * @param  null              $key
      *
      * @return $this
      */
-    public function addItem(MenuItemInterface $item)
+    public function addItem(MenuItemInterface $item, $key = null)
     {
-        $this->addTask($item);
+        $this->addTask($item, $key);
 
         return $this;
     }

@@ -84,18 +84,34 @@ class ChoiceStack
     }
 
     /**
+     * TODO - sprawdzioc wersje z while
+     *
      * @param Choice $choice
      *
      * @return bool
      */
     public function contains(Choice $choice)
     {
-        foreach ($this->stack as $stackChoice) {
+        foreach ($this->stack as $key => $stackChoice) {
             if ($stackChoice->equals($choice)) {
-                return true;
+                return $key;
             }
         }
 
-        return false;
+        return -1;
+    }
+
+    /**
+     * @param Choice $choice
+     *
+     * @return ChoiceStack
+     */
+    public function addOrRepositionChoice(Choice $choice)
+    {
+        if (($position = $this->contains($choice)) >= 0) {
+            unset($this->stack[$position]);
+            $this->stack = array_values($this->stack);
+        }
+        return $this->addChoice($choice);
     }
 }

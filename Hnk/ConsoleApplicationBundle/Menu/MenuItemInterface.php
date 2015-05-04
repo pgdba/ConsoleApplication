@@ -8,4 +8,9 @@ interface MenuItemInterface
      * @return string
      */
     public function getName();
+
+    /**
+     * @return array
+     */
+    public function getMenuOptions();
 }

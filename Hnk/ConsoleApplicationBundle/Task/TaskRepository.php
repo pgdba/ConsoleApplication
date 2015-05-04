@@ -68,14 +68,16 @@ class TaskRepository implements TaskRepositoryInterface
      */
     protected function generateTaskId(TaskAbstract $task)
     {
-        $id = md5($task->getName());
+        $sanitizedName = str_replace(array(' ', '-'), '_', $task->getName());
+
+        $id = $sanitizedName;
 
         $i = 1;
         do {
             if (!$this->hasTask($id)) {
                 return $id;
             }
-            $id = md5($task->getName() . $i);
+            $id = $sanitizedName . $i;
         } while ($i < 100);
 
         throw new \Exception(sprintf('Cannot create id for task %s', $task->getName()));
