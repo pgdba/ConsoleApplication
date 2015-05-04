@@ -22,8 +22,12 @@ class ChoiceStack
     /**
      * @param int $stackLimit
      */
-    public function __construct($stackLimit = self::DEFAULT_STACK_LIMIT)
+    public function __construct($stackLimit = null)
     {
+        if (null === $stackLimit) {
+            $stackLimit = self::DEFAULT_STACK_LIMIT;
+        }
+
         $this->stackLimit = $stackLimit;
         $this->stack = array();
     }

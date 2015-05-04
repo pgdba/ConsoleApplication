@@ -2,7 +2,7 @@
 
 namespace Hnk\ConsoleApplicationBundle\State;
 
-interface StateManagerInterface
+interface StateCacheInterface
 {
     /**
      * @param State $state

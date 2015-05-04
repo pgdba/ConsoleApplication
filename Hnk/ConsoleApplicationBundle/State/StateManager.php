@@ -2,54 +2,64 @@
 
 namespace Hnk\ConsoleApplicationBundle\State;
 
-class StateManager implements StateManagerInterface
+class StateManager
 {
     /**
-     * @var string
+     * @var array
      */
-    protected $saveFile;
+    protected $options;
 
     /**
-     * @param State $state
+     * @var StateCache
      */
-    public function persist(State $state)
+    protected $stateCache;
+
+    /**
+     * @param array $options
+     */
+    public function __construct($options)
     {
-        try {
-            file_put_contents($this->saveFile, serialize($state));
-        } catch(\Exception $e) {
-            ed($e, 'EXCEPTION');
-        }
+        $this->options = $options;
+
+        $this->stateCache = new StateCache($this->options['saveFile']);
     }
 
     /**
-     * @return State|null
+     * @return State
      */
-    public function load()
+    public function getState()
     {
         $state = null;
 
-        if (file_exists($this->saveFile)) {
-            try {
-                $serialized = file_get_contents($this->saveFile);
+        if ($this->stateCache->cacheExists()) {
+            $state = $this->stateCache->load();
+        }
 
-                $state = unserialize($serialized);
-            } catch(\Exception $e) {
-                ed($e, 'EXCEPTION');
-            }
+        if (!($state instanceof State)) {
+            $state = $this->createState();
         }
 
         return $state;
     }
 
     /**
-     * @param  string $saveFile
-     *
-     * @return $this
+     * @param State $state
      */
-    public function setSaveFile($saveFile)
+    public function saveState(State $state)
     {
-        $this->saveFile = $saveFile;
+        $this->stateCache->persist($state);
+    }
 
-        return $this;
+    /**
+     * @return State
+     */
+    protected function createState()
+    {
+        $stackLimit = (isset($this->options['stackLimit'])) ? $this->options['stackLimit'] : null;
+
+        $state = new State();
+        $state->setChoiceStack(new ChoiceStack($stackLimit));
+
+        return $state;
     }
 }
