@@ -3,6 +3,7 @@
 namespace Hnk\ConsoleApplicationBundle\Task;
 
 use Hnk\ConsoleApplicationBundle\Exception\UnknownMenuItemException;
+use Hnk\ConsoleApplicationBundle\Menu\MenuItemInterface;
 use Hnk\ConsoleApplicationBundle\Menu\MenuProviderInterface;
 
 class TaskGroup extends TaskAbstract implements MenuProviderInterface
@@ -64,5 +65,17 @@ class TaskGroup extends TaskAbstract implements MenuProviderInterface
         }
 
         return $this->tasks[$choice];
+    }
+
+    /**
+     * @param  MenuItemInterface $item
+     *
+     * @return $this
+     */
+    public function addItem(MenuItemInterface $item)
+    {
+        $this->addTask($item);
+
+        return $this;
     }
 }

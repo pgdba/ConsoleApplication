@@ -33,4 +33,11 @@ interface MenuProviderInterface
      * @return string
      */
     public function getDescription();
+
+    /**
+     * @param  MenuItemInterface $item
+     *
+     * @return $this
+     */
+    public function addItem(MenuItemInterface $item);
 }

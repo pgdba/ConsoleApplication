@@ -42,6 +42,7 @@ class Choice
     public function setParent($parent)
     {
         $this->parent = $parent;
+        $this->parent->setChild($this);
 
         return $this;
     }
@@ -147,5 +148,33 @@ class Choice
         }
 
         return true;
+    }
+
+    /**
+     * @return string
+     */
+    public function getChoiceName()
+    {
+        $name = '';
+
+        if ($this->hasChild()) {
+            $name = $this->child->getChoiceName() . ' > ';
+        }
+
+        $name .= $this->task->getName();
+
+        return $name;
+    }
+
+    /**
+     * @return TaskAbstract
+     */
+    public function getChoiceTask()
+    {
+        if ($this->hasChild()) {
+            return $this->child->getChoiceTask();
+        }
+
+        return $this->task;
     }
 }

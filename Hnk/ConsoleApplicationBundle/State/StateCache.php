@@ -33,7 +33,7 @@ class StateCache implements StateCacheInterface
         try {
             file_put_contents($this->saveFile, serialize($state));
         } catch(\Exception $e) {
-            ed($e, 'EXCEPTION');
+            throw $e; // TODO
         }
     }
 
@@ -50,7 +50,7 @@ class StateCache implements StateCacheInterface
 
                 $state = unserialize($serialized);
             } catch(\Exception $e) {
-                ed($e, 'EXCEPTION');
+                throw $e; // TODO
             }
         }
 
