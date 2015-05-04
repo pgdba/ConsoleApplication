@@ -14,7 +14,7 @@ class TaskGroup extends TaskAbstract implements MenuProviderInterface
 
     /**\
      * @param  TaskIdentifier $task
-     * @param  string       $key
+     * @param  string         $key
      *
      * @return $this
      */
