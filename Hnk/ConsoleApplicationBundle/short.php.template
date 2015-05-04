@@ -2,18 +2,13 @@
 <?php
 
 use Hnk\ConsoleApplicationBundle\App;
-use Hnk\ConsoleApplicationBundle\Task\TaskGroup;
 
 require_once __DIR__ . '/bootstrap.php';
 
 // main application definition
-$mainApp = new App();
+$app = new App(array(
+    App::OPTION_CACHE_DIR => __DIR__ . '/.hcaCache',
+    App::OPTION_TASK_FILE => __DIR__ . '/sample_tasks.php',
+));
 
-// task group wrapper
-$mainGroup = new TaskGroup('ConsoleApplication');
-$mainApp->setTask($mainGroup);
-
-// define your commands here
-//$mainGroup->addTask(...);
-
-$mainApp->run();
+$app->run();

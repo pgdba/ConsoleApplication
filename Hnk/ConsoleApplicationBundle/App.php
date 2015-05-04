@@ -19,6 +19,9 @@ use Hnk\ConsoleApplicationBundle\Task\TaskRepositoryFactory;
 
 class App
 {
+    const OPTION_CACHE_DIR = 'cacheDir';
+    const OPTION_TASK_FILE = 'taskFile';
+
     /**
      * @var TaskAbstract
      */
@@ -48,17 +51,27 @@ class App
      * @var TaskHelper
      */
     protected $taskHelper;
-    
-    public function __construct()
+
+    /**
+     * @var array
+     */
+    protected $options;
+
+    public function __construct($options = array())
     {
-        $cacheFile = __DIR__ .'/.hcaCache';
+        $this->validateOptions($options);
+        $this->options = $options;
+
+        $this->checkCache();
 
         $this->choice = new Choice();
-        $this->stateManager = new StateManager(array('saveFile' => $cacheFile));
+        $this->stateManager = new StateManager(array('saveFile' => $this->options[self::OPTION_CACHE_DIR] . '/state'));
         $this->state = $this->stateManager->getState();
         $taskRepositoryFactory = new TaskRepositoryFactory();
         $this->taskRepository = $taskRepositoryFactory->getTaskRepository();
         $this->taskHelper = TaskHelper::getInstance();
+
+        $this->loadTaskFile();
     }
 
     /**
@@ -147,6 +160,30 @@ class App
         }
 
         $lastChoice->setTask($task);
+    }
+
+    protected function validateOptions($options)
+    {
+        $requiredOptions = array(self::OPTION_CACHE_DIR, self::OPTION_TASK_FILE);
+
+        foreach($requiredOptions as $option) {
+            if (!array_key_exists($option, $options) || !$options[self::OPTION_CACHE_DIR]) {
+                throw new \Exception(sprintf('Option %s is required', self::OPTION_CACHE_DIR));
+            }
+        }
+    }
+
+    protected function checkCache()
+    {
+        if (!is_dir($this->options[self::OPTION_CACHE_DIR])) {
+            mkdir($this->options[self::OPTION_CACHE_DIR], 0777);
+        }
+    }
+
+    protected function loadTaskFile()
+    {
+        $app = $this;
+        require_once $this->options[self::OPTION_TASK_FILE];
     }
 
     protected function onClose()
