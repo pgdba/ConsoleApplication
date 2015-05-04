@@ -153,4 +153,18 @@ class TaskHelper
             throw new \Exception(sprintf('No files in dir %s', $src));
         }
     }
+
+    /**
+     * @param string $name
+     * @param string $description
+     */
+    public function renderTaskHeader($name, $description)
+    {
+        RenderHelper::println();
+        RenderHelper::println(RenderHelper::decorateText($name, RenderHelper::COLOR_GREEN));
+        if ($description) {
+            RenderHelper::println($description);
+        }
+        RenderHelper::println();
+    }
 }

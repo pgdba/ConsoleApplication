@@ -8,6 +8,9 @@ use Hnk\ConsoleApplicationBundle\Menu\MenuHandler;
 use Hnk\ConsoleApplicationBundle\Menu\MenuProviderInterface;
 use Hnk\ConsoleApplicationBundle\Task\RunnableTaskInterface;
 use Hnk\ConsoleApplicationBundle\Task\TaskAbstract;
+use Hnk\ConsoleApplicationBundle\Task\TaskIdentifier;
+use Hnk\ConsoleApplicationBundle\Task\TaskRepository;
+use Hnk\ConsoleApplicationBundle\Task\TaskRepositoryFactory;
 
 class App
 {
@@ -15,6 +18,23 @@ class App
      * @var TaskAbstract
      */
     protected $task;
+
+    /**
+     * @var TaskRepository
+     */
+    protected $taskRepository;
+
+    /**
+     * @var TaskHelper
+     */
+    protected $taskHelper;
+
+    public function __construct()
+    {
+        $taskRepositoryFactory = new TaskRepositoryFactory();
+        $this->taskRepository = $taskRepositoryFactory->getTaskRepository();
+        $this->taskHelper = TaskHelper::getInstance();
+    }
 
     /**
      *
@@ -31,20 +51,16 @@ class App
      */
     protected function handleTask(TaskAbstract $task)
     {
-        RenderHelper::println();
-        RenderHelper::println(RenderHelper::decorateText($task->getName(), RenderHelper::COLOR_GREEN));
-        if ($task->getDescription()) {
-            RenderHelper::println($task->getDescription());
-        }
-        RenderHelper::println();
+        $this->taskHelper->renderTaskHeader($task->getName(), $task->getDescription());
 
         if ($task instanceof MenuProviderInterface) {
-            $menuHandler = new MenuHandler(TaskHelper::getInstance());
+            $menuHandler = new MenuHandler($this->taskHelper);
 
             $selectedItem = $menuHandler->handle($task);
 
-            if ($selectedItem instanceof TaskAbstract) {
-                $this->handleTask($selectedItem);
+            if ($selectedItem instanceof TaskIdentifier) {
+                $selectedTask = $this->taskRepository->getTask($selectedItem);
+                $this->handleTask($selectedTask);
             }
 
             if (null === $selectedItem) {
@@ -70,5 +86,13 @@ class App
         $this->task = $task;
 
         return $this;
+    }
+
+    /**
+     * @return TaskRepository
+     */
+    public function getTaskRepository()
+    {
+        return $this->taskRepository;
     }
 }
