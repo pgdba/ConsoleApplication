@@ -57,6 +57,11 @@ class App
      */
     protected $options;
 
+    /**
+     * @param  array $options
+     *
+     * @throws \Exception
+     */
     public function __construct($options = array())
     {
         $this->validateOptions($options);
@@ -79,7 +84,6 @@ class App
      */
     public function run()
     {
-
         if ($this->task instanceof TaskGroup && $lastChoice = $this->state->getChoiceStack()->getFirst()) {
             $lastTask = $lastChoice->getChoiceTask()
                 ->setName($lastChoice->getChoiceName());
@@ -162,6 +166,13 @@ class App
         $lastChoice->setTask($task);
     }
 
+    /**
+     * TODO - change this method
+     *
+     * @param  $options
+     *
+     * @throws \Exception
+     */
     protected function validateOptions($options)
     {
         $requiredOptions = array(self::OPTION_CACHE_DIR, self::OPTION_TASK_FILE);
@@ -173,6 +184,9 @@ class App
         }
     }
 
+    /**
+     * TODO
+     */
     protected function checkCache()
     {
         if (!is_dir($this->options[self::OPTION_CACHE_DIR])) {
@@ -180,12 +194,18 @@ class App
         }
     }
 
+    /**
+     * TODO
+     */
     protected function loadTaskFile()
     {
         $app = $this;
         require_once $this->options[self::OPTION_TASK_FILE];
     }
 
+    /**
+     * TODO
+     */
     protected function onClose()
     {
         if ($this->choice->hasTask()) {
