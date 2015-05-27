@@ -30,13 +30,22 @@ class RenderHelper
 
     /**
      * Echoes test with new line
+     *
      * @param string $text
+     * @param string $color
      *
      * @return null
      */
-    public static function println($text = '')
+    public static function println($text = '', $color = null)
     {
+        if (null !== $color) {
+            echo self::getColorTag($color);
+        }
         echo $text . PHP_EOL;
+
+        if (null !== $color) {
+            echo self::getColorTag($color);
+        }
     }
 
     /**
@@ -53,7 +62,7 @@ class RenderHelper
         $line = trim(fgets(STDIN));
 
         if (null !== $color) {
-            self::clearColor();
+            self::$colorTags[self::COLOR_DEFAULT];
         }
 
         return $line;
@@ -117,6 +126,6 @@ class RenderHelper
      */
     public static function printError($text)
     {
-        self::println(self::decorateText($text, self::COLOR_RED));
+        self::println($text, self::COLOR_RED);
     }
 }

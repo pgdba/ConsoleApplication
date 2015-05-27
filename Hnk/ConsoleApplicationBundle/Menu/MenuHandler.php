@@ -2,6 +2,8 @@
 
 namespace Hnk\ConsoleApplicationBundle\Menu;
 
+use Hnk\ConsoleApplicationBundle\Exception\MenuException;
+use Hnk\ConsoleApplicationBundle\Exception\NoItemMenuException;
 use Hnk\ConsoleApplicationBundle\Helper\RenderHelper;
 use Hnk\ConsoleApplicationBundle\Helper\TaskHelper;
 
@@ -26,14 +28,14 @@ class MenuHandler
      *
      * @return MenuItemInterface|null
      *
-     * @throws \Exception
+     * @throws MenuException
      */
     public function handle(MenuProviderInterface $menuProvider, $defaultChoice = null)
     {
         $items = $menuProvider->getItems();
 
         if (empty($items)) {
-            throw new \Exception('No items'); // todo
+            throw new NoItemMenuException('Menu has no items');
         }
 
         RenderHelper::println();

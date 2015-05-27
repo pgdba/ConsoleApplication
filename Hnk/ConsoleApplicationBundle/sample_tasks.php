@@ -25,4 +25,19 @@ $deeperLs = new TaskGroup('deeper ls');
 $lsApp->addTask($deeperLs);
 $deeperLs->addTask(new Task('deeper ls', function($a){$a->getHelper()->runCommand('ls');}));
 
+$tailApp = new TaskGroup('tail');
+$mainApp->addTask($tailApp);
+
+$tailApp = new TaskGroup('tail');
+$mainApp->addTask($tailApp);
+$GLOBALS['dev'] = 1;
+$tailApp = new TaskGroup('tail');
+$mainApp->addTask($tailApp);
+//$tailApp = new TaskGroup('tail');
+//$mainApp->addTask($tailApp);
+//$tailApp = new TaskGroup('tail');
+//$mainApp->addTask($tailApp);
+
+
+
 

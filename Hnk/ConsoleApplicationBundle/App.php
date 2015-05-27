@@ -2,16 +2,14 @@
 
 namespace Hnk\ConsoleApplicationBundle;
 
+use Hnk\ConsoleApplicationBundle\Exception\MenuException;
 use Hnk\ConsoleApplicationBundle\Helper\RenderHelper;
 use Hnk\ConsoleApplicationBundle\Helper\TaskHelper;
 use Hnk\ConsoleApplicationBundle\Menu\MenuHandler;
 use Hnk\ConsoleApplicationBundle\Menu\MenuProviderInterface;
 use Hnk\ConsoleApplicationBundle\State\Choice;
-use Hnk\ConsoleApplicationBundle\State\ChoiceStack;
-use Hnk\ConsoleApplicationBundle\State\State;
 use Hnk\ConsoleApplicationBundle\State\StateManager;
 use Hnk\ConsoleApplicationBundle\Task\RunnableTaskInterface;
-use Hnk\ConsoleApplicationBundle\Task\TaskAbstract;
 use Hnk\ConsoleApplicationBundle\Task\TaskGroup;
 use Hnk\ConsoleApplicationBundle\Task\TaskIdentifier;
 use Hnk\ConsoleApplicationBundle\Task\TaskInterface;
@@ -86,42 +84,12 @@ class App
     }
 
     /**
-     * @param  TaskInterface $task
-     *
-     * @return $this
-     */
-    public function setTask(TaskInterface $task)
-    {
-        $this->task = $task;
-
-        return $this;
-    }
-
-
-    /**
-     * @return TaskRepository
-     */
-    public function getTaskRepository()
-    {
-        return $this->taskRepository;
-    }
-
-    /**
-     * @return TaskGroup
-     */
-    public function getTaskGroup()
-    {
-        return $this->taskGroup;
-    }
-
-
-    /**
      *
      */
     protected function addLastChoice()
     {
         /** @var Choice $lastChoice */
-        $lastChoice = $this->stateManager->getState()->getChoiceStack()->getFirst();
+        $lastChoice = $this->stateManager->getState()->getChoiceStack()->getLast();
 
         if (null !== $lastChoice) {
             $lastTask = $lastChoice->getChoiceTask()
@@ -142,34 +110,50 @@ class App
         $this->taskHelper->renderTaskHeader($task->getName(), $task->getDescription());
 
         if ($task instanceof MenuProviderInterface) {
-            $menuHandler = new MenuHandler($this->taskHelper);
-
-            $selectedItem = $menuHandler->handle($task);
-
-            if ($selectedItem instanceof TaskIdentifier) {
-                $this->handleChoice($selectedItem);
-                $selectedTask = $this->taskRepository->getTask($selectedItem);
-                $this->handleTask($selectedTask, ++$deep);
-            }
-
-            if (null === $selectedItem) {
-                $previousTaskId = $this->choice->getPreviousTaskId();
-
-                if (null !== $previousTaskId) { // todo
-                    $this->choice->removeLastChoiceTask();
-                    d($this->choice, 'after remove');
-                    $this->handleTask($this->getTaskRepository()->getTask($previousTaskId), --$deep);
-                } elseif (2 === $deep) {
-                    $this->handleTask($this->taskGroup);
-                } else {
-                    $this->onClose();
-                    RenderHelper::println('EXIT');
-                    exit;
-                }
-            }
+            $this->doHandleMenuTask($task, $deep);
         } elseif ($task instanceof RunnableTaskInterface) {
             $task->run();
-            $this->onClose();
+        }
+
+        $this->onClose();
+        exit;
+    }
+
+    /**
+     * @param MenuProviderInterface $task
+     * @param int                   $deep
+     *
+     * @throws \Exception
+     */
+    protected function doHandleMenuTask(MenuProviderInterface $task, $deep)
+    {
+        $menuHandler = new MenuHandler($this->taskHelper);
+
+        try {
+            $selectedItem = $menuHandler->handle($task);
+        } catch (MenuException $e) {
+            RenderHelper::printError($e->getMessage());
+            return;
+        }
+
+        if ($selectedItem instanceof TaskIdentifier) {
+            $this->handleChoice($selectedItem);
+            $selectedTask = $this->taskRepository->getTask($selectedItem);
+            $this->handleTask($selectedTask, ++$deep);
+        }
+
+        if (null === $selectedItem) {
+            $previousTaskId = $this->choice->getPreviousTaskId();
+
+            if (null !== $previousTaskId) { // todo
+                $this->choice->removeLastChoiceTask();
+                $this->handleTask($this->getTaskRepository()->getTask($previousTaskId), --$deep);
+            } elseif (2 === $deep) {
+                $this->handleTask($this->taskGroup);
+            } else {
+                RenderHelper::println('EXIT');
+                return;
+            }
         }
     }
 
@@ -228,9 +212,6 @@ class App
         require_once $this->options[self::OPTION_TASK_FILE];
     }
 
-    /**
-     * TODO
-     */
     protected function onClose()
     {
         if ($this->choice->hasTask()) {
@@ -246,5 +227,22 @@ class App
     {
         $this->taskGroup = new TaskGroup('ConsoleApplication');
         $this->taskGroup->setTaskRepository($this->taskRepository);
+    }
+
+
+    /**
+     * @return TaskRepository
+     */
+    public function getTaskRepository()
+    {
+        return $this->taskRepository;
+    }
+
+    /**
+     * @return TaskGroup
+     */
+    public function getTaskGroup()
+    {
+        return $this->taskGroup;
     }
 }

@@ -4,7 +4,7 @@
 use Hnk\ConsoleApplicationBundle\App;
 
 require_once __DIR__ . '/bootstrap.php';
-
+$GLOBALS['dev'] = 0;
 $appOptions = array(
     App::OPTION_CACHE_DIR => __DIR__ . '/.hcaCache',
     App::OPTION_TASK_FILE => __DIR__ . '/sample_tasks.php',

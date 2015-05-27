@@ -66,7 +66,7 @@ class ChoiceStack
     /**
      * @return Choice|null
      */
-    public function getFirst()
+    public function getLast()
     {
         if (!$this->isEmpty()) {
             return $this->stack[0];

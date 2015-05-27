@@ -77,7 +77,7 @@ class TaskRepository implements TaskRepositoryInterface
             if (!$this->hasTask($id)) {
                 return $id;
             }
-            $id = $sanitizedName . $i;
+            $id = $sanitizedName . ++$i;
         } while ($i < 100);
 
         throw new \Exception(sprintf('Cannot create id for task %s', $task->getName()));

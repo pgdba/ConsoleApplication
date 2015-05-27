@@ -59,6 +59,7 @@ class TaskGroup implements TaskInterface, MenuProviderInterface, TaskRepositoryA
      */
     public function addTask(TaskInterface $task, $key = null)
     {
+
         if (false === $this->isReady()) {
             throw new \Exception('TaskGroup is not ready');
         }
@@ -69,6 +70,7 @@ class TaskGroup implements TaskInterface, MenuProviderInterface, TaskRepositoryA
 
         $taskIdentifier = $this->taskRepository->storeTask($task);
 
+        $key = $this->getKeyForTask($key);
         $this->addTaskIdentifier($taskIdentifier, $key);
 
         return $this;
@@ -196,11 +198,39 @@ class TaskGroup implements TaskInterface, MenuProviderInterface, TaskRepositoryA
      */
     protected function addTaskIdentifier(TaskIdentifier $task, $key = null)
     {
-        if (!$key || false === (is_string($key) || is_numeric($key))) {
-            $key = count($this->tasks) + 1;
-        }
+        $key = $this->getKeyForTask($key);
 
         $this->tasks[$key] = $task;
+    }
+
+    /**
+     * @param string|int $key
+     * @param int       $try
+     *
+     * @return string|int
+     *
+     * @throws \Exception
+     */
+    protected function getKeyForTask($key, $try = 1)
+    {
+        if (30 < $try) {
+            throw new \Exception('Unable to generate key for task');
+        }
+
+        if (!$key || false === (is_string($key) || is_numeric($key))) {
+            $key = $this->getKeyForTask((count($this->tasks) + 1), ++$try);
+        } else {
+            if (in_array($key, array_keys($this->tasks))) {
+                if (is_numeric($key)) {
+                    $key++;
+                } else {
+                    $key = $key . '1';
+                }
+                $key = $this->getKeyForTask($key, ++$try);
+            }
+        }
+
+        return $key;
     }
 
     /**
