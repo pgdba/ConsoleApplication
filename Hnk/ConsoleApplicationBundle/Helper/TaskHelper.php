@@ -90,7 +90,7 @@ class TaskHelper
     {
         $default = ($defaultTrue) ? 'y' : 'n';
 
-        $choice = RenderHelper::renderChoice($prompt, $default, RenderHelper::COLOR_GREEN);
+        $choice = self::renderChoice($prompt, $default);
 
         if (in_array($choice, array('y', 'Y', 'yes', 'YES', 'Yes'))) {
             return true;
@@ -126,7 +126,7 @@ class TaskHelper
                 if (is_dir($path)) {
                     RenderHelper::println(sprintf(" * %s [dir]: %s", $path, RenderHelper::decorateText($index, RenderHelper::COLOR_YELLOW)));
                 } else {
-                    RenderHelper::println(sprintf(" * %s: %s", $path, RenderHelper::decorateText($index, Helper::COLOR_YELLOW)));
+                    RenderHelper::println(sprintf(" * %s: %s", $path, RenderHelper::decorateText($index, RenderHelper::COLOR_YELLOW)));
                 }
             }
 

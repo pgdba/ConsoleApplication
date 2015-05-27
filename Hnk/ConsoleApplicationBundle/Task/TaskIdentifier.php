@@ -121,4 +121,12 @@ class TaskIdentifier implements MenuItemInterface
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return '';
+    }
 }

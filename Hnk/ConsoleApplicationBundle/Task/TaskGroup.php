@@ -3,29 +3,73 @@
 namespace Hnk\ConsoleApplicationBundle\Task;
 
 use Hnk\ConsoleApplicationBundle\Exception\UnknownMenuItemException;
+use Hnk\ConsoleApplicationBundle\Helper\TaskHelper;
 use Hnk\ConsoleApplicationBundle\Menu\MenuItemInterface;
 use Hnk\ConsoleApplicationBundle\Menu\MenuProviderInterface;
 
-class TaskGroup extends TaskAbstract implements MenuProviderInterface
+class TaskGroup implements TaskInterface, MenuProviderInterface, TaskRepositoryAwareInterface
 {
+    /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @var string
+     */
+    protected $description;
+
     /**
      * @var TaskIdentifier[]
      */
     protected $tasks = array();
 
-    /**\
-     * @param  TaskIdentifier $task
+    /**
+     * @var TaskRepository
+     */
+    protected $taskRepository;
+
+    /**
+     * @var TaskHelper
+     */
+    protected $helper;
+
+    /**
+     * @param string        $name
+     * @param array         $options
+     * @param string        $description
+     * @param TaskInterface $parent
+     */
+    public function __construct($name, $options = array(), $description = '', TaskInterface $parent = null)
+    {
+        $this->name = $name;
+        $this->options = $options;
+        $this->description = $description;
+        $this->parent = null;
+        $this->helper = TaskHelper::getInstance();
+    }
+
+    /**
+     * @param  TaskInterface $task
      * @param  string         $key
      *
      * @return $this
+     *
+     * @throws \Exception
      */
-    public function addTask(TaskIdentifier $task, $key = null)
+    public function addTask(TaskInterface $task, $key = null)
     {
-        if (!$key || false === (is_string($key) || is_numeric($key))) {
-            $key = count($this->tasks) + 1;
+        if (false === $this->isReady()) {
+            throw new \Exception('TaskGroup is not ready');
         }
 
-        $this->tasks[$key] = $task;
+        if ($task instanceof TaskRepositoryAwareInterface) {
+            $task->setTaskRepository($this->taskRepository);
+        }
+
+        $taskIdentifier = $this->taskRepository->storeTask($task);
+
+        $this->addTaskIdentifier($taskIdentifier, $key);
 
         return $this;
     }
@@ -71,11 +115,101 @@ class TaskGroup extends TaskAbstract implements MenuProviderInterface
      * @param  null              $key
      *
      * @return $this
+     *
+     * @throws \Exception
      */
     public function addItem(MenuItemInterface $item, $key = null)
     {
-        $this->addTask($item, $key);
+        if ($item instanceof TaskIdentifier) {
+            $this->addTaskIdentifier($item, $key);
+        } elseif ($item instanceof TaskInterface) {
+            $this->addTask($item, $key);
+        } else {
+            throw \Exception(sprintf('Invalid item type: %s', get_class($item)));
+        }
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @return TaskRepository
+     */
+    public function getTaskRepository()
+    {
+        return $this->taskRepository;
+    }
+
+    /**
+     * @param  TaskRepositoryInterface $taskRepository
+     *
+     * @return null
+     */
+    public function setTaskRepository(TaskRepositoryInterface $taskRepository)
+    {
+        $this->taskRepository = $taskRepository;
+    }
+
+    /**
+     * @param  string $name
+     *
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @param  string $description
+     *
+     * @return $this
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+
+    /**
+     * @param TaskIdentifier $task
+     * @param string|null    $key
+     */
+    protected function addTaskIdentifier(TaskIdentifier $task, $key = null)
+    {
+        if (!$key || false === (is_string($key) || is_numeric($key))) {
+            $key = count($this->tasks) + 1;
+        }
+
+        $this->tasks[$key] = $task;
+    }
+
+    /**
+     * Checks if TaskGroup is ready for task storing
+     *
+     * @return bool
+     */
+    protected function isReady()
+    {
+        return null !== $this->taskRepository;
     }
 }

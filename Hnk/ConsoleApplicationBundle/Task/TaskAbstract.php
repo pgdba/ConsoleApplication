@@ -5,7 +5,7 @@ namespace Hnk\ConsoleApplicationBundle\Task;
 use Hnk\ConsoleApplicationBundle\Helper\TaskHelper;
 use Hnk\ConsoleApplicationBundle\Menu\MenuItemInterface;
 
-abstract class TaskAbstract implements MenuItemInterface
+abstract class TaskAbstract implements TaskInterface, MenuItemInterface
 {
     /**
      * @var string
@@ -23,7 +23,7 @@ abstract class TaskAbstract implements MenuItemInterface
     protected $options;
 
     /**
-     * @var TaskAbstract
+     * @var TaskInterface
      */
     protected $parent;
 
@@ -33,12 +33,12 @@ abstract class TaskAbstract implements MenuItemInterface
     protected $helper;
 
     /**
-     * @param string       $name
-     * @param array        $options
-     * @param string       $description
-     * @param TaskAbstract $parent
+     * @param string        $name
+     * @param array         $options
+     * @param string        $description
+     * @param TaskInterface $parent
      */
-    public function __construct($name, $options = array(), $description = '', TaskAbstract $parent = null)
+    public function __construct($name, $options = array(), $description = '', TaskInterface $parent = null)
     {
         $this->name = $name;
         $this->options = $options;
@@ -161,11 +161,11 @@ abstract class TaskAbstract implements MenuItemInterface
     }
 
     /**
-     * @param  TaskAbstract $parent
+     * @param  TaskInterface $parent
      *
      * @return $this
      */
-    public function setParent(TaskAbstract $parent)
+    public function setParent(TaskInterface $parent)
     {
         $this->parent = $parent;
 
@@ -177,7 +177,7 @@ abstract class TaskAbstract implements MenuItemInterface
      */
     public function hasParent()
     {
-        return ($this->parent instanceof TaskAbstract);
+        return ($this->parent instanceof TaskInterface);
     }
 
     /**

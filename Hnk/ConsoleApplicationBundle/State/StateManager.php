@@ -10,9 +10,14 @@ class StateManager
     protected $options;
 
     /**
-     * @var StateCache
+     * @var StateCacheInterface
      */
     protected $stateCache;
+
+    /**
+     * @var State
+     */
+    protected $state;
 
     /**
      * @param array $options
@@ -22,6 +27,8 @@ class StateManager
         $this->options = $options;
 
         $this->stateCache = new StateCache($this->options['saveFile']);
+
+        $this->loadState();
     }
 
     /**
@@ -29,25 +36,29 @@ class StateManager
      */
     public function getState()
     {
-        $state = null;
-
-        if ($this->stateCache->cacheExists()) {
-            $state = $this->stateCache->load();
-        }
-
-        if (!($state instanceof State)) {
-            $state = $this->createState();
-        }
-
-        return $state;
+        return $this->state;
     }
 
     /**
-     * @param State $state
+     *
      */
-    public function saveState(State $state)
+    public function saveState()
     {
-        $this->stateCache->persist($state);
+        $this->stateCache->persist($this->state);
+    }
+
+    /**
+     *
+     */
+    protected function loadState()
+    {
+        if ($this->stateCache->cacheExists()) {
+            $this->state = $this->stateCache->load();
+        }
+
+        if (!($this->state instanceof State)) {
+            $this->state = $this->createState();
+        }
     }
 
     /**

@@ -14,6 +14,7 @@ use Hnk\ConsoleApplicationBundle\Task\RunnableTaskInterface;
 use Hnk\ConsoleApplicationBundle\Task\TaskAbstract;
 use Hnk\ConsoleApplicationBundle\Task\TaskGroup;
 use Hnk\ConsoleApplicationBundle\Task\TaskIdentifier;
+use Hnk\ConsoleApplicationBundle\Task\TaskInterface;
 use Hnk\ConsoleApplicationBundle\Task\TaskRepository;
 use Hnk\ConsoleApplicationBundle\Task\TaskRepositoryFactory;
 
@@ -23,19 +24,14 @@ class App
     const OPTION_TASK_FILE = 'taskFile';
 
     /**
-     * @var TaskAbstract
+     * @var TaskGroup
      */
-    protected $task;
+    protected $taskGroup;
 
     /**
      * @var Choice
      */
     protected $choice;
-
-    /**
-     * @var State
-     */
-    protected $state;
 
     /**
      * @var StateManager
@@ -71,10 +67,10 @@ class App
 
         $this->choice = new Choice();
         $this->stateManager = new StateManager(array('saveFile' => $this->options[self::OPTION_CACHE_DIR] . '/state'));
-        $this->state = $this->stateManager->getState();
-        $taskRepositoryFactory = new TaskRepositoryFactory();
-        $this->taskRepository = $taskRepositoryFactory->getTaskRepository();
+        $this->taskRepository = TaskRepositoryFactory::getInstance()->getTaskRepository();
         $this->taskHelper = TaskHelper::getInstance();
+
+        $this->initTaskGroup();
 
         $this->loadTaskFile();
     }
@@ -84,23 +80,64 @@ class App
      */
     public function run()
     {
-        if ($this->task instanceof TaskGroup && $lastChoice = $this->state->getChoiceStack()->getFirst()) {
-            $lastTask = $lastChoice->getChoiceTask()
-                ->setName($lastChoice->getChoiceName());
-            $lastTask->setOption('menuOptions', array('extraSpace' => true, 'noCache' => true, 'menuLabel' => 'LAST: '));
-            $this->task->addItem($lastTask, 'q');
-        }
+        $this->addLastChoice();
 
-        $this->handleTask($this->task);
+        $this->handleTask($this->taskGroup);
     }
 
     /**
-     * @param  TaskAbstract $task
-     * @param  int          $deep
+     * @param  TaskInterface $task
+     *
+     * @return $this
+     */
+    public function setTask(TaskInterface $task)
+    {
+        $this->task = $task;
+
+        return $this;
+    }
+
+
+    /**
+     * @return TaskRepository
+     */
+    public function getTaskRepository()
+    {
+        return $this->taskRepository;
+    }
+
+    /**
+     * @return TaskGroup
+     */
+    public function getTaskGroup()
+    {
+        return $this->taskGroup;
+    }
+
+
+    /**
+     *
+     */
+    protected function addLastChoice()
+    {
+        /** @var Choice $lastChoice */
+        $lastChoice = $this->stateManager->getState()->getChoiceStack()->getFirst();
+
+        if (null !== $lastChoice) {
+            $lastTask = $lastChoice->getChoiceTask()
+                ->setName($lastChoice->getChoiceName());
+            $lastTask->setOption('menuOptions', array('extraSpace' => true, 'noCache' => true, 'menuLabel' => 'LAST: '));
+            $this->taskGroup->addItem($lastTask, 'q');
+        }
+    }
+
+    /**
+     * @param  TaskInterface $task
+     * @param  int           $deep
      *
      * @throws \Exception
      */
-    protected function handleTask(TaskAbstract $task, $deep = 1)
+    protected function handleTask(TaskInterface $task, $deep = 1)
     {
         $this->taskHelper->renderTaskHeader($task->getName(), $task->getDescription());
 
@@ -123,7 +160,7 @@ class App
                     d($this->choice, 'after remove');
                     $this->handleTask($this->getTaskRepository()->getTask($previousTaskId), --$deep);
                 } elseif (2 === $deep) {
-                    $this->handleTask($this->task);
+                    $this->handleTask($this->taskGroup);
                 } else {
                     $this->onClose();
                     RenderHelper::println('EXIT');
@@ -134,18 +171,6 @@ class App
             $task->run();
             $this->onClose();
         }
-    }
-
-    /**
-     * @param  TaskAbstract $task
-     *
-     * @return $this
-     */
-    public function setTask(TaskAbstract $task)
-    {
-        $this->task = $task;
-
-        return $this;
     }
 
     protected function handleChoice(TaskIdentifier $task)
@@ -209,16 +234,17 @@ class App
     protected function onClose()
     {
         if ($this->choice->hasTask()) {
-            $this->state->getChoiceStack()->addChoice($this->choice);
+            $this->stateManager->getState()->getChoiceStack()->addChoice($this->choice);
         }
-        $this->stateManager->saveState($this->state);
+        $this->stateManager->saveState();
     }
 
     /**
-     * @return TaskRepository
+     *
      */
-    public function getTaskRepository()
+    protected function initTaskGroup()
     {
-        return $this->taskRepository;
+        $this->taskGroup = new TaskGroup('ConsoleApplication');
+        $this->taskGroup->setTaskRepository($this->taskRepository);
     }
 }

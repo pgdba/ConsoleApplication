@@ -15,13 +15,13 @@ class TaskRepository implements TaskRepositoryInterface
     }
 
     /**
-     * @param  TaskAbstract $task
+     * @param  TaskInterface $task
      *
      * @return TaskIdentifier
      *
      * @throws \Exception
      */
-    public function storeTask(TaskAbstract $task)
+    public function storeTask(TaskInterface $task)
     {
         $id = $this->generateTaskId($task);
         $this->tasks[$id] = $task;
@@ -60,13 +60,13 @@ class TaskRepository implements TaskRepositoryInterface
     }
 
     /**
-     * @param  TaskAbstract $task
+     * @param  TaskInterface $task
      *
      * @return string
      *
      * @throws \Exception
      */
-    protected function generateTaskId(TaskAbstract $task)
+    protected function generateTaskId(TaskInterface $task)
     {
         $sanitizedName = str_replace(array(' ', '-'), '_', $task->getName());
 
