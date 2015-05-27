@@ -2,6 +2,5 @@
 
 namespace Hnk\ConsoleApplicationBundle\Exception;
 
-class UnknownMenuItemException extends MenuException
-{
-}
+class MenuException extends \Exception
+{}

@@ -2,7 +2,7 @@
 
 namespace Hnk\ConsoleApplicationBundle\Task;
 
-interface TaskRepositoryAware
+interface TaskRepositoryAwareInterface
 {
     /**
      * @return TaskRepository

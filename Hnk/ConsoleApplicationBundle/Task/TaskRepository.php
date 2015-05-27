@@ -15,13 +15,13 @@ class TaskRepository implements TaskRepositoryInterface
     }
 
     /**
-     * @param  TaskAbstract $task
+     * @param  TaskInterface $task
      *
      * @return TaskIdentifier
      *
      * @throws \Exception
      */
-    public function storeTask(TaskAbstract $task)
+    public function storeTask(TaskInterface $task)
     {
         $id = $this->generateTaskId($task);
         $this->tasks[$id] = $task;
@@ -60,22 +60,24 @@ class TaskRepository implements TaskRepositoryInterface
     }
 
     /**
-     * @param  TaskAbstract $task
+     * @param  TaskInterface $task
      *
      * @return string
      *
      * @throws \Exception
      */
-    protected function generateTaskId(TaskAbstract $task)
+    protected function generateTaskId(TaskInterface $task)
     {
-        $id = md5($task->getName());
+        $sanitizedName = str_replace(array(' ', '-'), '_', $task->getName());
+
+        $id = $sanitizedName;
 
         $i = 1;
         do {
             if (!$this->hasTask($id)) {
                 return $id;
             }
-            $id = md5($task->getName() . $i);
+            $id = $sanitizedName . ++$i;
         } while ($i < 100);
 
         throw new \Exception(sprintf('Cannot create id for task %s', $task->getName()));

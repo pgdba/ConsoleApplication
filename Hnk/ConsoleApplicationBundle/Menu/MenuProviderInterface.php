@@ -3,8 +3,9 @@
 namespace Hnk\ConsoleApplicationBundle\Menu;
 
 use Hnk\ConsoleApplicationBundle\Exception\UnknownMenuItemException;
+use Hnk\ConsoleApplicationBundle\Task\NameableInterface;
 
-interface MenuProviderInterface
+interface MenuProviderInterface extends NameableInterface
 {
     /**
      * Get choice list for selection
@@ -25,12 +26,10 @@ interface MenuProviderInterface
     public function getSelectedItem($choice);
 
     /**
-     * @return string
+     * @param  MenuItemInterface $item
+     * @param  null              $key
+     *
+     * @return $this
      */
-    public function getName();
-
-    /**
-     * @return string
-     */
-    public function getDescription();
+    public function addItem(MenuItemInterface $item, $key = null);
 }

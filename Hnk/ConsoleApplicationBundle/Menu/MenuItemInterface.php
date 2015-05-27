@@ -2,10 +2,12 @@
 
 namespace Hnk\ConsoleApplicationBundle\Menu;
 
-interface MenuItemInterface
+use Hnk\ConsoleApplicationBundle\Task\NameableInterface;
+
+interface MenuItemInterface extends NameableInterface
 {
     /**
-     * @return string
+     * @return array
      */
-    public function getName();
+    public function getMenuOptions();
 }

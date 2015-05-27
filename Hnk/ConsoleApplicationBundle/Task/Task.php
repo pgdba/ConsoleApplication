@@ -10,13 +10,13 @@ class Task extends TaskAbstract implements RunnableTaskInterface
     protected $handler;
 
     /**
-     * @param string       $name
-     * @param \Closure     $handler
-     * @param array        $options
-     * @param string       $description
-     * @param TaskAbstract $parent
+     * @param string        $name
+     * @param \Closure      $handler
+     * @param array         $options
+     * @param string        $description
+     * @param TaskInterface $parent
      */
-    public function __construct($name, \Closure $handler, $options = array(), $description = '', TaskAbstract $parent = null)
+    public function __construct($name, \Closure $handler, $options = array(), $description = '', TaskInterface $parent = null)
     {
         parent::__construct($name, $options, $description, $parent);
         $this->handler = $handler;

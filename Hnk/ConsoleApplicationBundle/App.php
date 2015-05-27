@@ -2,22 +2,39 @@
 
 namespace Hnk\ConsoleApplicationBundle;
 
+use Hnk\ConsoleApplicationBundle\Exception\MenuException;
 use Hnk\ConsoleApplicationBundle\Helper\RenderHelper;
 use Hnk\ConsoleApplicationBundle\Helper\TaskHelper;
 use Hnk\ConsoleApplicationBundle\Menu\MenuHandler;
 use Hnk\ConsoleApplicationBundle\Menu\MenuProviderInterface;
+use Hnk\ConsoleApplicationBundle\State\Choice;
+use Hnk\ConsoleApplicationBundle\State\StateManager;
 use Hnk\ConsoleApplicationBundle\Task\RunnableTaskInterface;
-use Hnk\ConsoleApplicationBundle\Task\TaskAbstract;
+use Hnk\ConsoleApplicationBundle\Task\TaskGroup;
 use Hnk\ConsoleApplicationBundle\Task\TaskIdentifier;
+use Hnk\ConsoleApplicationBundle\Task\TaskInterface;
 use Hnk\ConsoleApplicationBundle\Task\TaskRepository;
 use Hnk\ConsoleApplicationBundle\Task\TaskRepositoryFactory;
 
 class App
 {
+    const OPTION_CACHE_DIR = 'cacheDir';
+    const OPTION_TASK_FILE = 'taskFile';
+
     /**
-     * @var TaskAbstract
+     * @var TaskGroup
      */
-    protected $task;
+    protected $taskGroup;
+
+    /**
+     * @var Choice
+     */
+    protected $choice;
+
+    /**
+     * @var StateManager
+     */
+    protected $stateManager;
 
     /**
      * @var TaskRepository
@@ -29,11 +46,31 @@ class App
      */
     protected $taskHelper;
 
-    public function __construct()
+    /**
+     * @var array
+     */
+    protected $options;
+
+    /**
+     * @param  array $options
+     *
+     * @throws \Exception
+     */
+    public function __construct($options = array())
     {
-        $taskRepositoryFactory = new TaskRepositoryFactory();
-        $this->taskRepository = $taskRepositoryFactory->getTaskRepository();
+        $this->validateOptions($options);
+        $this->options = $options;
+
+        $this->checkCache();
+
+        $this->choice = new Choice();
+        $this->stateManager = new StateManager(array('saveFile' => $this->options[self::OPTION_CACHE_DIR] . '/state'));
+        $this->taskRepository = TaskRepositoryFactory::getInstance()->getTaskRepository();
         $this->taskHelper = TaskHelper::getInstance();
+
+        $this->initTaskGroup();
+
+        $this->loadTaskFile();
     }
 
     /**
@@ -41,52 +78,157 @@ class App
      */
     public function run()
     {
-        $this->handleTask($this->task);
+        $this->addLastChoice();
+
+        $this->handleTask($this->taskGroup);
     }
 
     /**
-     * @param  TaskAbstract $task
      *
-     * @throws \Exception
      */
-    protected function handleTask(TaskAbstract $task)
+    protected function addLastChoice()
     {
-        $this->taskHelper->renderTaskHeader($task->getName(), $task->getDescription());
+        /** @var Choice $lastChoice */
+        $lastChoice = $this->stateManager->getState()->getChoiceStack()->getLast();
 
-        if ($task instanceof MenuProviderInterface) {
-            $menuHandler = new MenuHandler($this->taskHelper);
-
-            $selectedItem = $menuHandler->handle($task);
-
-            if ($selectedItem instanceof TaskIdentifier) {
-                $selectedTask = $this->taskRepository->getTask($selectedItem);
-                $this->handleTask($selectedTask);
-            }
-
-            if (null === $selectedItem) {
-                if ($task->hasParent()) { // todo
-                    $this->handleTask($task->getParent());
-                } else {
-                    RenderHelper::println('EXIT');
-                    exit;
-                }
-            }
-        } elseif ($task instanceof RunnableTaskInterface) {
-            $task->run();
+        if (null !== $lastChoice) {
+            $lastTask = $lastChoice->getChoiceTask()
+                ->setName($lastChoice->getChoiceName());
+            $lastTask->setOption('menuOptions', array('extraSpace' => true, 'noCache' => true, 'menuLabel' => 'LAST: '));
+            $this->taskGroup->addItem($lastTask, 'q');
         }
     }
 
     /**
-     * @param  TaskAbstract $task
+     * @param  TaskInterface $task
+     * @param  int           $deep
      *
-     * @return $this
+     * @throws \Exception
      */
-    public function setTask(TaskAbstract $task)
+    protected function handleTask(TaskInterface $task, $deep = 1)
     {
-        $this->task = $task;
+        $this->taskHelper->renderTaskHeader($task->getName(), $task->getDescription());
 
-        return $this;
+        if ($task instanceof MenuProviderInterface) {
+            $this->doHandleMenuTask($task, $deep);
+        } elseif ($task instanceof RunnableTaskInterface) {
+            $task->run();
+        }
+
+        $this->onClose();
+        exit;
     }
+
+    /**
+     * @param MenuProviderInterface $task
+     * @param int                   $deep
+     *
+     * @throws \Exception
+     */
+    protected function doHandleMenuTask(MenuProviderInterface $task, $deep)
+    {
+        $menuHandler = new MenuHandler($this->taskHelper);
+
+        try {
+            $selectedItem = $menuHandler->handle($task);
+        } catch (MenuException $e) {
+            RenderHelper::printError($e->getMessage());
+            return;
+        }
+
+        if ($selectedItem instanceof TaskIdentifier) {
+            $this->handleChoice($selectedItem);
+            $selectedTask = $this->taskRepository->getTask($selectedItem);
+            $this->handleTask($selectedTask, ++$deep);
+        }
+
+        if (null === $selectedItem) {
+            $previousTaskId = $this->choice->getPreviousTaskId();
+
+            if (null !== $previousTaskId) { // todo
+                $this->choice->removeLastChoiceTask();
+                $this->handleTask($this->getTaskRepository()->getTask($previousTaskId), --$deep);
+            } elseif (2 === $deep) {
+                $this->handleTask($this->taskGroup);
+            } else {
+                RenderHelper::println('EXIT');
+                return;
+            }
+        }
+    }
+
+    protected function handleChoice(TaskIdentifier $task)
+    {
+        $options = $task->getMenuOptions();
+        if (isset($options['noCache'])) {
+            return;
+        }
+
+        $lastChoice = $this->choice->getLastChild();
+
+        if ($lastChoice->hasTask()) {
+            $newChoice = new Choice();
+            $lastChoice->setChild($newChoice);
+            $lastChoice = $newChoice;
+        }
+
+        $lastChoice->setTask($task);
+    }
+
+    /**
+     * TODO - change this method
+     *
+     * @param  $options
+     *
+     * @throws \Exception
+     */
+    protected function validateOptions($options)
+    {
+        $requiredOptions = array(self::OPTION_CACHE_DIR, self::OPTION_TASK_FILE);
+
+        foreach($requiredOptions as $option) {
+            if (!array_key_exists($option, $options) || !$options[self::OPTION_CACHE_DIR]) {
+                throw new \Exception(sprintf('Option %s is required', self::OPTION_CACHE_DIR));
+            }
+        }
+    }
+
+    /**
+     * TODO
+     */
+    protected function checkCache()
+    {
+        if (!is_dir($this->options[self::OPTION_CACHE_DIR])) {
+            mkdir($this->options[self::OPTION_CACHE_DIR], 0777);
+        }
+    }
+
+    /**
+     * TODO
+     */
+    protected function loadTaskFile()
+    {
+        $app = $this;
+        require_once $this->options[self::OPTION_TASK_FILE];
+    }
+
+    protected function onClose()
+    {
+        if ($this->choice->hasTask()) {
+            $this->stateManager->getState()->getChoiceStack()->addChoice($this->choice);
+        }
+        $this->stateManager->saveState();
+    }
+
+    /**
+     *
+     */
+    protected function initTaskGroup()
+    {
+        $this->taskGroup = new TaskGroup('ConsoleApplication');
+        $this->taskGroup->setTaskRepository($this->taskRepository);
+    }
+
 
     /**
      * @return TaskRepository
@@ -94,5 +236,13 @@ class App
     public function getTaskRepository()
     {
         return $this->taskRepository;
+    }
+
+    /**
+     * @return TaskGroup
+     */
+    public function getTaskGroup()
+    {
+        return $this->taskGroup;
     }
 }

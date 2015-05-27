@@ -13,12 +13,12 @@ abstract class CommonTask extends TaskAbstract implements RunnableTaskInterface
     const BASE_NAME = '';
 
     /**
-     * @param string       $name
-     * @param array        $options
-     * @param string       $description
-     * @param TaskAbstract $parent
+     * @param string        $name
+     * @param array         $options
+     * @param string        $description
+     * @param TaskInterface $parent
      */
-    public function __construct($name = '', $options = array(), $description = '', TaskAbstract $parent = null)
+    public function __construct($name = '', $options = array(), $description = '', TaskInterface $parent = null)
     {
         parent::__construct($name, $options, $description, $parent);
     }
