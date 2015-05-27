@@ -30,13 +30,7 @@ $mainApp->addTask($tailApp);
 
 $tailApp = new TaskGroup('tail');
 $mainApp->addTask($tailApp);
-$GLOBALS['dev'] = 1;
-$tailApp = new TaskGroup('tail');
-$mainApp->addTask($tailApp);
-//$tailApp = new TaskGroup('tail');
-//$mainApp->addTask($tailApp);
-//$tailApp = new TaskGroup('tail');
-//$mainApp->addTask($tailApp);
+
 
 
 
