@@ -3,7 +3,7 @@
 
 use Hnk\ConsoleApplicationBundle\App;
 
-define('DEBUG_DIR', dirname(dirname(HNK_CONSOLE_APPLICATION_BASE_DIR)).'/Debug/Hnk/Debug');
+define('DEBUG_DIR', dirname(dirname(dirname(dirname(__DIR__)))).'/Debug/Hnk/Debug');
 
 require_once __DIR__ . '/bootstrap.php';
 
