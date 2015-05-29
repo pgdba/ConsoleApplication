@@ -92,18 +92,32 @@ class App
         $keys = array('q', 'w', 'e');
         $lastChoices = $this->stateManager->getState()->getChoiceStack()->getChoices(0, $lastChoiceLimit);
 
-        foreach($lastChoices as $index => $choice) {
+        $index = 1;
+        $isFirst = true;
+        foreach($lastChoices as $choice) {
             if (null !== $choice) {
-                $menuOptions = array('noCache' => true, 'menuLabel' => 'LAST '. ($index + 1) .': ');
-                if (0 === $index) {
-                    $menuOptions['extraSpace'] = true;
+                $menuOptions = array('noCache' => true, 'menuLabel' => 'LAST '. $index .': ');
+
+                // TODO - shitty hack, needs fixing
+                $task = $choice->getChoiceTask();
+
+                if (null === $task) {
+                    continue;
                 }
 
-                $lastTask = clone $choice->getChoiceTask(); // TODO - fix this hack
-                $lastTask->setName($choice->getChoiceName())
+                $task = clone $task; // wtf...
+
+                if ($isFirst) {
+                    $menuOptions['extraSpace'] = true;
+                    $isFirst = false;
+                }
+
+                $task->setName($choice->getChoiceName())
                     ->setOption('menuOptions', $menuOptions);
 
-                $this->taskGroup->addItem($lastTask, $keys[$index]);
+                $this->taskGroup->addItem($task, $keys[$index]);
+
+                $index++;
             }
         }
     }
