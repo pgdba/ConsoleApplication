@@ -135,11 +135,12 @@ class App
         if ($task instanceof MenuProviderInterface) {
             $this->doHandleMenuTask($task, $deep);
         } elseif ($task instanceof RunnableTaskInterface) {
-            $task->run();
             $this->choice->setHasRunnableTask(true);
+            $this->saveState();
+
+            $task->run();
         }
 
-        $this->onClose();
         exit;
     }
 
@@ -236,7 +237,7 @@ class App
         require_once $this->options[self::OPTION_TASK_FILE];
     }
 
-    protected function onClose()
+    protected function saveState()
     {
         if ($this->choice->hasRunnableTask()) {
             $this->stateManager->getState()->getChoiceStack()->addChoice($this->choice);
