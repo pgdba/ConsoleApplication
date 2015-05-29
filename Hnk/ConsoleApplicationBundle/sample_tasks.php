@@ -1,5 +1,7 @@
 <?php
 
+use Hnk\ConsoleApplicationBundle\CommonTask\Linux\Ls;
+use Hnk\ConsoleApplicationBundle\CommonTask\Linux\Tail;
 use Hnk\ConsoleApplicationBundle\Task\Task;
 use Hnk\ConsoleApplicationBundle\Task\TaskGroup;
 
@@ -21,17 +23,23 @@ $mainApp->addTask($lsApp, 5);
 $lsApp->addTask(new Task('ls in HNK_CONSOLE_APPLICATION_APP_DIR', function($a){$a->getHelper()->runCommand('ls', HNK_CONSOLE_APPLICATION_APP_DIR);}), 1);
 $lsApp->addTask(new Task('ls in HNK_CONSOLE_APPLICATION_BASE_DIR', function($a){$a->getHelper()->runCommand('ls', HNK_CONSOLE_APPLICATION_BASE_DIR);}), 2);
 
+$lsCommon = new Ls('in main dir');
+$lsApp->addTask(
+    $lsCommon
+        ->setDirectory('/')
+        ->setOptions(array('l', 'a'))
+);
+
 $deeperLs = new TaskGroup('deeper ls');
 $lsApp->addTask($deeperLs);
 $deeperLs->addTask(new Task('deeper ls', function($a){$a->getHelper()->runCommand('ls');}));
 
+
+// common tasks
 $tailApp = new TaskGroup('tail');
 $mainApp->addTask($tailApp);
 
-$tailApp = new TaskGroup('tail');
-$mainApp->addTask($tailApp);
-
-
-
-
-
+$tailSingle = new Tail('single file');
+$tailApp->addTask(
+    $tailSingle->setFiles(array('~/.bash_profile'))
+);

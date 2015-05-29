@@ -62,7 +62,7 @@ class RenderHelper
         $line = trim(fgets(STDIN));
 
         if (null !== $color) {
-            self::$colorTags[self::COLOR_DEFAULT];
+            self::setColor(self::COLOR_DEFAULT);
         }
 
         return $line;

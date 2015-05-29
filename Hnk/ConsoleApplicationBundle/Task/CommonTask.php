@@ -29,6 +29,13 @@ abstract class CommonTask extends TaskAbstract implements RunnableTaskInterface
     abstract public function handler();
 
     /**
+     * @return null
+     *
+     * @throws \Exception
+     */
+    abstract public function checkReady();
+
+    /**
      * @return string
      */
     public function getName()
@@ -45,6 +52,8 @@ abstract class CommonTask extends TaskAbstract implements RunnableTaskInterface
      */
     public function run()
     {
+        $this->checkReady();
+
         $this->handler();
     }
 }
