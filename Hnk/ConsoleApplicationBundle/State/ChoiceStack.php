@@ -68,11 +68,37 @@ class ChoiceStack
      */
     public function getLast()
     {
-        if (!$this->isEmpty()) {
-            return $this->stack[0];
+        return $this->getChoice(0);
+    }
+
+    /**
+     * @param int $index
+     *
+     * @return Choice|null
+     */
+    public function getChoice($index = 0)
+    {
+        if (isset($this->stack[$index])) {
+            return $this->stack[$index];
         }
 
         return null;
+    }
+
+    /**
+     * @param int $fromIndex
+     * @param int $limit
+     *
+     * @return Choice[]
+     */
+    public function getChoices($fromIndex = 0, $limit = 1)
+    {
+        $choices = array();
+        for($i = 0; $i <= $limit; $i++) {
+            $choices[$i] = $this->getChoice($fromIndex + $i);
+        }
+
+        return $choices;
     }
 
     /**

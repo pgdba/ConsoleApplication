@@ -2,6 +2,7 @@
 
 namespace Hnk\ConsoleApplicationBundle\State;
 
+use Hnk\ConsoleApplicationBundle\Task\RunnableTaskInterface;
 use Hnk\ConsoleApplicationBundle\Task\TaskAbstract;
 use Hnk\ConsoleApplicationBundle\Task\TaskIdentifier;
 
@@ -24,6 +25,11 @@ class Choice
      * @var TaskIdentifier
      */
     protected $task;
+
+    /**
+     * @var bool
+     */
+    protected $hasRunnableTask = false;
 
     /**
      * @return Choice|null
@@ -207,5 +213,25 @@ class Choice
         }
 
         return $taskId;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasRunnableTask()
+    {
+        return $this->hasRunnableTask;
+    }
+
+    /**
+     * @param  boolean $hasRunnableTask
+     *
+     * @return $this
+     */
+    public function setHasRunnableTask($hasRunnableTask)
+    {
+        $this->hasRunnableTask = $hasRunnableTask;
+
+        return $this;
     }
 }

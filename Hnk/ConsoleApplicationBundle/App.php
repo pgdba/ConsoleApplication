@@ -88,14 +88,23 @@ class App
      */
     protected function addLastChoice()
     {
-        /** @var Choice $lastChoice */
-        $lastChoice = $this->stateManager->getState()->getChoiceStack()->getLast();
+        $lastChoiceLimit = 3;
+        $keys = array('q', 'w', 'e');
+        $lastChoices = $this->stateManager->getState()->getChoiceStack()->getChoices(0, $lastChoiceLimit);
 
-        if (null !== $lastChoice) {
-            $lastTask = $lastChoice->getChoiceTask()
-                ->setName($lastChoice->getChoiceName());
-            $lastTask->setOption('menuOptions', array('extraSpace' => true, 'noCache' => true, 'menuLabel' => 'LAST: '));
-            $this->taskGroup->addItem($lastTask, 'q');
+        foreach($lastChoices as $index => $choice) {
+            if (null !== $choice) {
+                $menuOptions = array('noCache' => true, 'menuLabel' => 'LAST '. ($index + 1) .': ');
+                if (0 === $index) {
+                    $menuOptions['extraSpace'] = true;
+                }
+
+                $lastTask = clone $choice->getChoiceTask(); // TODO - fix this hack
+                $lastTask->setName($choice->getChoiceName())
+                    ->setOption('menuOptions', $menuOptions);
+
+                $this->taskGroup->addItem($lastTask, $keys[$index]);
+            }
         }
     }
 
@@ -113,6 +122,7 @@ class App
             $this->doHandleMenuTask($task, $deep);
         } elseif ($task instanceof RunnableTaskInterface) {
             $task->run();
+            $this->choice->setHasRunnableTask(true);
         }
 
         $this->onClose();
@@ -214,7 +224,7 @@ class App
 
     protected function onClose()
     {
-        if ($this->choice->hasTask()) {
+        if ($this->choice->hasRunnableTask()) {
             $this->stateManager->getState()->getChoiceStack()->addChoice($this->choice);
         }
         $this->stateManager->saveState();

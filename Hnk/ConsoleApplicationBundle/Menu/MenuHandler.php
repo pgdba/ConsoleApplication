@@ -54,6 +54,7 @@ class MenuHandler
 
             RenderHelper::println(sprintf(' * %s: %s', $label, RenderHelper::decorateText($key, RenderHelper::COLOR_YELLOW)));
         }
+        RenderHelper::println();
         RenderHelper::println(sprintf(' * exit: %s', RenderHelper::decorateText('<enter>', RenderHelper::COLOR_YELLOW)));
 
         RenderHelper::println();
