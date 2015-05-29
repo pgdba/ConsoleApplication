@@ -26,11 +26,15 @@ class Up extends AbstractVagrantCommand
 
     /**
      * Adds provision option
+     *
+     * @return $this
      */
     public function provision()
     {
         if (!in_array('--provision', $this->commandOptions)) {
             $this->commandOptions[] = '--provision';
         }
+
+        return $this;
     }
 }
