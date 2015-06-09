@@ -89,7 +89,7 @@ class App
     protected function addLastChoice()
     {
         $lastChoiceLimit = 3;
-        $keys = array('q', 'w', 'e');
+        $keys = array(1 => 'q', 2 => 'w', 3 => 'e', 4 => 'r');
         $lastChoices = $this->stateManager->getState()->getChoiceStack()->getChoices(0, $lastChoiceLimit);
 
         $index = 1;

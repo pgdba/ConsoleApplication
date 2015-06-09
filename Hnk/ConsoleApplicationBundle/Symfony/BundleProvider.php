@@ -135,4 +135,23 @@ class BundleProvider implements MenuProviderInterface
         }
         return;
     }
+
+    /**
+     * @param  MenuItemInterface $item
+     * @param  null              $key
+     *
+     * @return $this
+     *
+     * @throws \Exception
+     */
+    public function addItem(MenuItemInterface $item, $key = null)
+    {
+        if ($item instanceof Bundle) {
+            $this->bundles[$key] = $item;
+        } else {
+            throw \Exception(sprintf('Invalid item type: %s', get_class($item)));
+        }
+
+        return $this;
+    }
 }

@@ -17,6 +17,16 @@ abstract class AbstractCommand extends CommonTask
     protected $useSudo = false;
 
     /**
+     * @var ProjectInterface
+     */
+    protected $project;
+
+    /**
+     * @var string
+     */
+    protected $workPath = null;
+
+    /**
      * @return array
      */
     public function getCommandOptions()
@@ -91,5 +101,68 @@ abstract class AbstractCommand extends CommonTask
         }
 
         return $command;
+    }
+
+    /**
+     * @return ProjectInterface
+     */
+    public function getProject()
+    {
+        return $this->project;
+    }
+
+    /**
+     * @param  ProjectInterface $project
+     *
+     * @return $this
+     */
+    public function setProject(ProjectInterface $project)
+    {
+        $this->project = $project;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWorkPath()
+    {
+        return $this->workPath;
+    }
+
+    /**
+     * @param  string $workPath
+     *
+     * @return $this
+     */
+    public function setWorkPath($workPath)
+    {
+        $this->workPath = $workPath;
+
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getRunDirectory()
+    {
+        $path = null;
+
+        if (null !== $this->workPath) {
+            $path = $this->workPath;
+        } else {
+            if (null !== $this->project) {
+                $path = $this->project->getPath();
+            }
+        }
+
+        // TODO -sanitize path
+//        if (null !== $path) {
+//            $path = (strpos)
+//        }
+
+        return $path;
     }
 }

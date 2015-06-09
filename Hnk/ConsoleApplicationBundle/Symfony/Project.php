@@ -2,7 +2,9 @@
 
 namespace Hnk\ConsoleApplicationBundle\Symfony;
 
-class Project
+use Hnk\ConsoleApplicationBundle\CommonTask\ProjectInterface;
+
+class Project implements ProjectInterface
 {
     const ENVIRONMENT_DEV = 1;
     const ENVIRONMENT_PROD = 2;
@@ -89,5 +91,13 @@ class Project
         $this->environments[$key] = $name;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
     }
 }

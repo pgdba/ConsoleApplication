@@ -65,4 +65,20 @@ class Bundle implements MenuItemInterface
 
         return $this;
     }
+
+    /**
+     * @return array
+     */
+    public function getMenuOptions()
+    {
+        // TODO: Implement getMenuOptions() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        // TODO: Implement getDescription() method.
+    }
 }
