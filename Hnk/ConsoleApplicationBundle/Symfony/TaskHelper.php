@@ -20,7 +20,7 @@ class TaskHelper extends BaseTaskHelper
 
         RenderHelper::println('Available bundles:');
         foreach ($bundles as $key => $bundle) {
-            RenderHelper::println(sprintf(" * %s: %s", $bundle['name'], RenderHelper::decorateText($key, self::COLOR_YELLOW)));
+            RenderHelper::println(sprintf(" * %s: %s", $bundle['name'], RenderHelper::decorateText($key, RenderHelper::COLOR_YELLOW)));
             if ($bundle['name'] == $defaultBundle) {
                 $defaultChoice = $key;
             }
